@@ -1,8 +1,8 @@
 ﻿#pragma once
 #ifdef _MSC_VER
-#define EXPORT __declspec(dllexport) _cdecl
+#define BYOND_FUNC __declspec(dllexport) const char* _cdecl
 #else
-#define EXPORT __attribute__((visibility("default"))) _cdecl
+#define BYOND_FUNC __attribute__((visibility("default"))) const char* _cdecl
 #endif
 
 #include <mysql/mysql.h>

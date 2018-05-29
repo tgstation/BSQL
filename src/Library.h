@@ -1,9 +1,6 @@
 #pragma once
 
 class Library {
-public:
-	static const char* GoodReturn;
-	static const char* BadReturn;
 private:
 	std::map<std::string, Connection> connections;
 

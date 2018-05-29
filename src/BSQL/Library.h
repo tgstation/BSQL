@@ -7,11 +7,9 @@ public:
 private:
 	unsigned long long identifierCounter;
 
-	std::map<std::string, Connection> connections;
+	std::map<std::string, std::unique_ptr<Connection>> connections;
 public:
 	Library();
-
-	std::string GenerateIdentifier();
 
 	std::string CreateConnection(Connection::Type connectionType);
 	Connection* GetConnection(const std::string& identifier);
