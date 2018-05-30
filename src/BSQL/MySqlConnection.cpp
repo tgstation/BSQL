@@ -1,6 +1,8 @@
 #include "BSQL.h"
 
-MySqlConnection::MySqlConnection() : Connection(Type::MySql) 
+MySqlConnection::MySqlConnection() : 
+	Connection(Type::MySql),
+	newestConnectionAttempt(nullptr)
 {}
 
 MySqlConnection::~MySqlConnection() {
@@ -15,11 +17,34 @@ MySqlConnection::~MySqlConnection() {
 }
 
 std::string MySqlConnection::Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password) {
+	//can't connect twice
+	if (!operations.empty() || !availableConnections.empty())
+		return std::string();
+
+	this->address = address;
+	this->port = port;
+	this->username = username;
+	this->password = password;
+
+	LoadNewConnection();
+
+	return operations.begin()->first;
+}
+
+bool MySqlConnection::LoadNewConnection() {
+	if (newestConnectionAttempt)
+		//this will chain into calling ReleaseConnection and clear the var
+		return newestConnectionAttempt->IsComplete();
+
 	auto mysql(mysql_init(nullptr));
 	if (mysql == nullptr)
 		throw std::bad_alloc();
 	mysql_options(mysql, MYSQL_OPT_NONBLOCK, 0);
-	return AddOp(std::make_unique<MySqlConnectOperation>(mysql, address, port, username, password));
+	auto newCon(std::make_unique<MySqlConnectOperation>(*this, mysql, address, port, username, password));
+	newestConnectionAttempt = newCon.get();
+	AddOp(std::move(newCon));
+
+	return false;
 }
 
 std::string MySqlConnection::CreateQuery(const std::string& queryText) {
@@ -39,4 +64,6 @@ MYSQL* MySqlConnection::RequestConnection() {
 
 void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 	availableConnections.emplace(connection);
+	if (newestConnectionAttempt && newestConnectionAttempt->IsComplete())
+		newestConnectionAttempt = nullptr;
 }

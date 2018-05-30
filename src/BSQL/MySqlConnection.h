@@ -1,5 +1,7 @@
 #pragma once
 
+class MySqlConnectOperation;
+
 class MySqlConnection : public Connection {
 private:
 	std::string address;
@@ -8,7 +10,7 @@ private:
 	unsigned short port;
 
 	std::queue<MYSQL*> availableConnections;
-	std::unique_ptr<MySqlConnectOperation> newestConnectionAttempt;
+	MySqlConnectOperation* newestConnectionAttempt;
 private:
 	bool LoadNewConnection();
 public:

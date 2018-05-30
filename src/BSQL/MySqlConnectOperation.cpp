@@ -1,6 +1,7 @@
 #include "BSQL.h"
 
-MySqlConnectOperation::MySqlConnectOperation(MYSQL* const mysql, const std::string& address, const unsigned short port, const std::string& username, const std::string& password) :
+MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, MYSQL* const mysql, const std::string& address, const unsigned short port, const std::string& username, const std::string& password) :
+	connPool(connPool),
 	mysql(mysql),
 	complete(false)
 {
@@ -29,6 +30,8 @@ bool MySqlConnectOperation::IsComplete() {
 	if (complete) {
 		if (!ret)
 			error = "Failed to mysql_real_connect()!";
+		else
+			connPool.ReleaseConnection(mysql);
 	}
 	else
 		return false;

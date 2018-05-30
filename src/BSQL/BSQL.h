@@ -20,8 +20,8 @@
 #include "Query.h"
 #include "Connection.h"
 
-#include "MySqlConnectOperation.h"
 #include "MySqlConnection.h"
+#include "MySqlConnectOperation.h"
 #include "MySqlQueryOperation.h"
 
 #include "Library.h"
