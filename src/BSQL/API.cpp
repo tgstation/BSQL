@@ -16,13 +16,13 @@ BYOND_FUNC Initialize(const int argumentCount, const char* const* const args) no
 }
 
 BYOND_FUNC Shutdown(const int argumentCount, const char* const* const args) noexcept {
-	if (!library)
-		return "Library not initialized!";
-	if (!lastCreatedConnection.empty())
-		lastCreatedConnection = std::string();
-	if (!lastCreatedOperation.empty())
-		lastCreatedOperation = std::string();
-	library.reset();
+	if (library) {
+		if (!lastCreatedConnection.empty())
+			lastCreatedConnection = std::string();
+		if (!lastCreatedOperation.empty())
+			lastCreatedOperation = std::string();
+		library.reset();
+	}
 	return nullptr;
 }
 
@@ -63,8 +63,9 @@ BYOND_FUNC CreateConnection(const int argumentCount, const char* const* const ar
 		std::string conType(connectionType);
 		if (conType == "MySql")
 			type = Connection::Type::MySql;
-		else if (conType == "SqlServer")
-			type = Connection::Type::SqlServer;
+		//TODO
+		//else if (conType == "SqlServer")
+		//	type = Connection::Type::SqlServer;
 		else
 			return "Invalid connection type!";
 	}
@@ -85,9 +86,7 @@ BYOND_FUNC CreateConnection(const int argumentCount, const char* const* const ar
 }
 
 BYOND_FUNC GetConnection(const int argumentCount, const char* const* const args) noexcept {
-	if (!library)
-		return "Library not initialized!";
-	if (lastCreatedConnection.empty())
+	if (!library || lastCreatedConnection.empty())
 		return nullptr;
 	returnValueHolder = std::string();
 	std::swap(returnValueHolder, lastCreatedConnection);
@@ -113,9 +112,7 @@ BYOND_FUNC ReleaseConnection(const int argumentCount, const char* const* const a
 }
 
 BYOND_FUNC GetOperation(const int argumentCount, const char* const* const args) noexcept {
-	if (!library)
-		return "Library not initialized!";
-	if (lastCreatedOperation.empty())
+	if (!library || lastCreatedOperation.empty())
 		return nullptr;
 	returnValueHolder = std::string();
 	std::swap(returnValueHolder, lastCreatedOperation);
@@ -123,11 +120,26 @@ BYOND_FUNC GetOperation(const int argumentCount, const char* const* const args) 
 }
 
 BYOND_FUNC ReleaseOperation(const int argumentCount, const char* const* const args) noexcept {
-	if (lastCreatedOperation.empty())
+	if (argumentCount != 2)
+		return "Invalid arguments!";
+	const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+	if (!connectionIdentifier)
+		return "Invalid connection identifier!";
+	if (!operationIdentifier)
+		return "Invalid operation identifier!";
+	if (!library)
+		return "Library not initialized!";
+	try {
+		auto connection(library->GetConnection(connectionIdentifier));
+		if (!connection)
+			return "Connection identifier does not exist!";
+		if (!connection->ReleaseOperation(operationIdentifier))
+			return "Operation identifier does not exist!";
 		return nullptr;
-	returnValueHolder = std::string();
-	std::swap(returnValueHolder, lastCreatedOperation);
-	return returnValueHolder.c_str();
+	}
+	catch (std::bad_alloc&) {
+		return "Out of memory!";
+	}
 }
 
 BYOND_FUNC OpenConnection(const int argumentCount, const char* const* const args) noexcept {
@@ -194,6 +206,8 @@ BYOND_FUNC NewQuery(const int argumentCount, const char* const* const args) noex
 		if (!connection)
 			return "Connection identifier does not exist!";
 		lastCreatedOperation = connection->CreateQuery(queryText);
+		if (lastCreatedOperation.empty())
+			return "Error creating query! Is the connection complete?";
 		return nullptr;
 	}
 	catch (std::bad_alloc&) {
@@ -221,6 +235,26 @@ const char* TryLoadQuery(const int argumentCount, const char* const* const args,
 			return "Operation is not a query!";
 		*query = static_cast<Query*>(operation);
 		return nullptr;
+	}
+	catch (std::bad_alloc&) {
+		return "Out of memory!";
+	}
+}
+
+BYOND_FUNC OpComplete(const int argumentCount, const char* const* const args) noexcept {
+	if (argumentCount != 2)
+		return nullptr;
+	const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+	if (!connectionIdentifier || !!operationIdentifier)
+		return nullptr;
+	try {
+		auto connection(library->GetConnection(lastCreatedOperationConnectionId));
+		if (!connection)
+			return nullptr;
+		auto operation(connection->GetOperation(operationIdentifier));
+		if (!operation)
+			return nullptr;
+		return operation->IsComplete() ? "DONE" : "NOTDONE";
 	}
 	catch (std::bad_alloc&) {
 		return "Out of memory!";
