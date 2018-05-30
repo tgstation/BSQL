@@ -1,6 +1,6 @@
 #include "BSQL.h"
 
-Library::Library() :
+Library::Library() noexcept :
 	identifierCounter(0)
 {}
 
@@ -18,11 +18,13 @@ bool Library::ReleaseConnection(const std::string& identifier) noexcept {
 std::string Library::CreateConnection(Connection::Type type) noexcept {
 	if (identifierCounter < std::numeric_limits<unsigned long long>().max()) {
 		try {
-			std::string identifier(++identifierCounter);
+			auto identifier(std::to_string(++identifierCounter));
 
 			switch (type)
 			{
 			case Connection::Type::MySql:
+				connections.emplace(identifier, std::make_unique<MySqlConnection>());
+				break;
 			case Connection::Type::SqlServer:
 				--identifierCounter;
 				return std::string();

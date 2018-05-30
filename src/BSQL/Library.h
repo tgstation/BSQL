@@ -9,9 +9,9 @@ private:
 
 	std::map<std::string, std::unique_ptr<Connection>> connections;
 public:
-	Library();
+	Library() noexcept;
 
-	std::string CreateConnection(Connection::Type connectionType);
-	Connection* GetConnection(const std::string& identifier);
-	bool ReleaseConnection(const std::string& identifier);
+	std::string CreateConnection(Connection::Type connectionType) noexcept;
+	Connection* GetConnection(const std::string& identifier) noexcept;
+	bool ReleaseConnection(const std::string& identifier) noexcept;
 };

@@ -9,9 +9,13 @@ public:
 public:
 	const Type type;
 private:
-	std::map<std::string, Operation> operations;
+	std::map<std::string, std::unique_ptr<Operation>> operations;
 
 	unsigned long long identifierCounter;
+protected:
+	Connection(Type type);
+
+	std::string AddOp(std::unique_ptr<Operation>&& operation);
 public:
 	virtual ~Connection() = 0;
 

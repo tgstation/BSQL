@@ -6,5 +6,5 @@ private:
 public:
 	std::string CurrentRow() const;
 
-	bool BeginGetNextRow();
+	virtual bool BeginGetNextRow() = 0;
 };
