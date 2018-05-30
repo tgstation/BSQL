@@ -23,8 +23,8 @@ services:
   - mysql
 install:
   - cd / && git clone --depth=1 https://github.com/Microsoft/vcpkg
-  - cd /vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb
+  - cd /vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb:x86-linux
   - build/install_byond.sh
 script:
-  - mkdir build && cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake && make test
+  - mkdir artifacts && cd artifacts && cmake .. -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake && make test
   - cd tests && ./test_byond.sh
