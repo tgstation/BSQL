@@ -1,5 +1,5 @@
 /world/proc/_BSQL_Internal_Call(func, ...)
-	return call("BSQL.dll", func)(arglist(args.Copy(1)))
+	return call(system_type == MS_WINDOWS ? "BSQL.dll" : "BSQL.so", func)(arglist(args.Copy(1)))
 
 /world/proc/_BSQL_Initialized(new_val)
 	var/static/bsql_library_initialized = FALSE
