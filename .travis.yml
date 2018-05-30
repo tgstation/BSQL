@@ -1,0 +1,16 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+cache:
+  directories:
+    - /vcpkg
+addons:
+  apt:
+    packages:
+      - cmake
+install:
+  - cd / && git clone --depth=1 https://github.com/Microsoft/vcpkg
+  - cd /vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb
+script:
+  - mkdir build && cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake && make test
