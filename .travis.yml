@@ -6,6 +6,7 @@ cache:
   directories:
     - /vcpkg
 addons:
+  mariadb: '10.0'
   apt:
     packages:
       - cmake
