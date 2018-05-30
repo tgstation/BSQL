@@ -6,12 +6,13 @@
 #endif
 
 #include <mysql/mysql.h>
-#include <nlohmann/json.hpp>
 
 #include <atomic>
 #include <chrono>
+#include <deque>
 #include <map>
 #include <memory>
+#include <queue>
 #include <string>
 #include <thread>
 

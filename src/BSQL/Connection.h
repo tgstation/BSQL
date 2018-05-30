@@ -8,16 +8,16 @@ public:
 	};
 public:
 	const Type type;
-private:
+protected:
 	std::map<std::string, std::unique_ptr<Operation>> operations;
-
+private:
 	unsigned long long identifierCounter;
 protected:
 	Connection(Type type);
 
 	std::string AddOp(std::unique_ptr<Operation>&& operation);
 public:
-	virtual ~Connection() = 0;
+	virtual ~Connection() = default;
 
 	Operation* GetOperation(const std::string& identifier);
 	bool ReleaseOperation(const std::string& identifier);

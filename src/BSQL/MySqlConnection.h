@@ -2,7 +2,15 @@
 
 class MySqlConnection : public Connection {
 private:
-	MYSQL mysql;
+	std::string address;
+	std::string username;
+	std::string password;
+	unsigned short port;
+
+	std::queue<MYSQL*> availableConnections;
+	std::unique_ptr<MySqlConnectOperation> newestConnectionAttempt;
+private:
+	bool LoadNewConnection();
 public:
 	MySqlConnection();
 	~MySqlConnection() override;

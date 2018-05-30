@@ -5,7 +5,7 @@ class Operation {
 protected:
 	std::string error;
 public:
-	virtual ~Operation() = 0;
+	virtual ~Operation() = default;
 
 	std::string GetError();
 

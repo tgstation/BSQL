@@ -2,17 +2,18 @@
 
 MySqlConnectOperation::MySqlConnectOperation(MYSQL* const mysql, const std::string& address, const unsigned short port, const std::string& username, const std::string& password) :
 	mysql(mysql),
-	status(mysql_real_connect_start(&ret, mysql, address.c_str(), username.c_str(), password.c_str(), nullptr, port, nullptr, 0)),
 	complete(false)
-{}
+{
+	mysql_real_connect_start(&ret, mysql, address.c_str(), username.c_str(), password.c_str(), nullptr, port, nullptr, 0);
+}
 
 MySqlConnectOperation::~MySqlConnectOperation() {
 	if (complete)
 		return;
-	status = mysql_real_connect_cont(&ret, mysql, status);
+	auto status(mysql_real_connect_cont(&ret, mysql, 0));
 	while (status) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		status = mysql_real_connect_cont(&ret, mysql, status);
+		status = mysql_real_connect_cont(&ret, mysql, 0);
 	}
 }
 
@@ -21,16 +22,15 @@ bool MySqlConnectOperation::IsQuery() {
 }
 
 bool MySqlConnectOperation::IsComplete() {
-	if (!complete) {
-		if (status)
-			status = mysql_real_connect_cont(&ret, mysql, status);
-		complete = status == 0;
-		if (complete) {
-			if (!ret)
-				error = "Failed to mysql_real_connect()!";
-		}
-		else
-			return false;
+	if (complete)
+		return true;
+	const auto status(mysql_real_connect_cont(&ret, mysql, 0));
+	complete = status == 0;
+	if (complete) {
+		if (!ret)
+			error = "Failed to mysql_real_connect()!";
 	}
+	else
+		return false;
 	return true;
 }

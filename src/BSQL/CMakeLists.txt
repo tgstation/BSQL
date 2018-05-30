@@ -4,9 +4,6 @@ find_path(MARIA_INCLUDE_DIR mysql/mysql.h)
 include_directories(${MARIA_INCLUDE_DIR})
 find_library(MARIA_LIBRARY libmariadb)
 
-find_path(JSON_INCLUDE_DIR nlohmann/json.hpp)
-include_directories(${JSON_INCLUDE_DIR})
-
 add_library (BSQL SHARED
 BSQL.cpp
 API.cpp
@@ -16,6 +13,7 @@ MySqlConnection.cpp
 Operation.cpp
 MySqlConnectOperation.cpp
 MySqlQueryOperation.cpp
+Query.cpp
 )
 
 add_precompiled_header(BSQL BSQL.h FORCEINCLUDE)
