@@ -53,7 +53,7 @@ Get the error message associated with an operation. Should not be used while IsC
 /*
 Gets an associated list of column name -> value representation of the most recent row in the query. Only valid if IsComplete() returns TRUE. If this returns null and no errors are present there are no more results in the query.
 
- Returns: An associated list of column name -> value for the row
+ Returns: An associated list of column name -> value for the row. Values will always be either strings or null
 */
 /datum/BSQL_Operation/Query/proc/CurrentRow()
 	return
