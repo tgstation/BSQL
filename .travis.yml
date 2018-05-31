@@ -22,9 +22,8 @@ env:
   - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 services:
   - mysql
-before_install:
-  - eval "${MATRIX_EVAL}"
 install:
+  - eval "${MATRIX_EVAL}"
   - cd $HOME && git clone --depth=1 https://github.com/Microsoft/vcpkg
   - cd $HOME/vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb:x86-linux
   - build/install_byond.sh
