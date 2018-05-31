@@ -7,12 +7,7 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Connection)
 /datum/BSQL_Connection/New(connection_type)
 	src.connection_type = connection_type
 
-	if(!world._BSQL_Initialized())
-		var/result = world._BSQL_Internal_Call("Initialize")
-		if(result)
-			BSQL_ERROR(result)
-			return
-		world._BSQL_Initialized(TRUE)
+	world._BSQL_InitCheck(src)
 
 	var/error = world._BSQL_Internal_Call("CreateConnection", connection_type)
 	if(error)
