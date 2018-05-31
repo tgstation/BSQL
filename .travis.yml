@@ -8,25 +8,15 @@ env:
 cache:
   directories:
     - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
-    - $HOME/vcpkg
 addons:
   apt:
-    sources:
-      - llvm-toolchain-trusty-5.0
     packages:
       - cmake
       - libc6-i386
       - libstdc++6:i386
-      - clang-5.0
-env:
-  - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+      - libmariadb-dev
 services:
   - mysql
-install:
-  - eval "${MATRIX_EVAL}"
-  - cd $HOME && git clone --depth=1 https://github.com/Microsoft/vcpkg
-  - cd $HOME/vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb:x86-linux
-  - build/install_byond.sh
 script:
-  - mkdir artifacts && cd artifacts && cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake && make test
+  - mkdir artifacts && cd artifacts && cmake .. && make test
   - cd tests && ./test_byond.sh
