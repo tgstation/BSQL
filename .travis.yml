@@ -20,5 +20,7 @@ install:
   - cd mariadb-connector-c && cmake . && make libmariadb
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make test
+  - ls mariadb-connector-c
+  - mariadb-connector-c/libmariadb
   - mv mariadb-connector-c/libmariadb/libmariadb.so tests/ && cp artifacts/BSQL.so tests/
   - cd tests && ./test_byond.sh
