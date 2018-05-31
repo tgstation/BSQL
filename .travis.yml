@@ -19,7 +19,7 @@ install:
   - git clone --depth=1 https://github.com/MariaDB/mariadb-connector-c
   - cd mariadb-connector-c && cmake . && make libmariadb
 script:
-  - mkdir artifacts && cd artifacts && cmake .. && make test
+  - mkdir artifacts && cd artifacts && cmake .. && make test && cd ..
   - ls mariadb-connector-c
   - mariadb-connector-c/libmariadb
   - mv mariadb-connector-c/libmariadb/libmariadb.so tests/ && cp artifacts/BSQL.so tests/
