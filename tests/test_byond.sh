@@ -12,7 +12,7 @@ then
 	else
 		#move in the artifacts
 		cp ../artifacts/BSQL.so ./
-		cp /vcpkg/packages/libmariadb/libmariadb_x86-linux/lib/libmariadb.so ./
+		cp $HOME/vcpkg/packages/libmariadb/libmariadb_x86-linux/lib/libmariadb.so ./
 		DreamDaemon travistester.dmb -close -trusted -params "dbaddr=127.0.0.1&dbport=3306&dbuser=root&dbpass="
 		cat clean_run.lk
 	fi
