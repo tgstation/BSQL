@@ -21,7 +21,7 @@ addons:
 services:
   - mysql
 install:
-  - cd / && git clone --depth=1 https://github.com/Microsoft/vcpkg
+  - cd $HOME && git clone --depth=1 https://github.com/Microsoft/vcpkg
   - cd $HOME/vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb:x86-linux
   - build/install_byond.sh
 script:
