@@ -12,7 +12,6 @@ cache:
 addons:
   sources:
     - ubuntu-toolchain-r-test
-packages:
   apt:
     packages:
       - cmake
@@ -24,7 +23,7 @@ env:
 services:
   - mysql
 before_install:
-    - eval "${MATRIX_EVAL}"
+  - eval "${MATRIX_EVAL}"
 install:
   - cd $HOME && git clone --depth=1 https://github.com/Microsoft/vcpkg
   - cd $HOME/vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb:x86-linux
