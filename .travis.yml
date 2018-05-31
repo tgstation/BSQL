@@ -1,7 +1,4 @@
 language: cpp
-compiler:
-  - clang
-  - gcc
 git:
   depth: 1
 env:
@@ -13,11 +10,15 @@ cache:
     - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
     - $HOME/vcpkg
 addons:
+  sources:
+    - ubuntu-toolchain-r-test
+packages:
   apt:
     packages:
       - cmake
       - libc6-i386
       - libstdc++6:i386
+      - g++-7
 services:
   - mysql
 install:
