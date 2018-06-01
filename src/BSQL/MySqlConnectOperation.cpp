@@ -5,7 +5,7 @@ MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, MYSQL* c
 	mysql(mysql),
 	complete(false)
 {
-	mysql_real_connect_start(&ret, mysql, address.c_str(), username.c_str(), password.c_str(), nullptr, port, nullptr, 0);
+	mysql_real_connect_start(&ret, mysql, address.c_str(), username.c_str(), password.c_str(), nullptr, port, nullptr, CLIENT_MULTI_STATEMENTS);
 }
 
 MySqlConnectOperation::~MySqlConnectOperation() {
