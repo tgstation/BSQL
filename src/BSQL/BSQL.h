@@ -1,5 +1,4 @@
-﻿#pragma once
-#ifdef _MSC_VER
+﻿#ifdef _MSC_VER
 #define BYOND_FUNC __declspec(dllexport) const char* _cdecl
 #else
 #define BYOND_FUNC __attribute__((visibility("default"))) const char* _cdecl
