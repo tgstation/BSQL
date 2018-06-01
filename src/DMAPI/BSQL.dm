@@ -35,7 +35,7 @@ Starts an operation for a query
 	return
 
 /*
-Checks if the operation is complete
+Checks if the operation is complete. This, in some cases must be called multiple times with false return before a result is present regardless of timespan. For best performance check it once per tick
 
  Returns: TRUE if the operation is complete, FALSE if it's not, null on error
 */
