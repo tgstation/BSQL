@@ -17,6 +17,7 @@ addons:
       - gcc-7-multilib
       - linux-libc-dev:i386
       - libstdc++6:i386
+      - libssl-dev:i386
 env:
   - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 services:
