@@ -44,6 +44,9 @@ bool MySqlQueryOperation::IsComplete() {
 
 	if (!queryFinished) {
 		const auto status(mysql_real_query_cont(&queryError, connection, 0));
+		if (status != 0)
+			return false;
+
 		if (queryError) {
 			complete = true;
 			error = "mysql_real_query() returns error " + std::to_string(queryError);
