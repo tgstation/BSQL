@@ -18,8 +18,8 @@ include_directories(${MARIA_INCLUDE_DIR})
 find_library(MARIA_LIBRARY libmariadb)
 target_link_libraries(BSQL ${MARIA_LIBRARY})
 else() #system package
-find_package(libmariadb)
-target_link_libraries(BSQL libmariadb)
+find_package(libmariadbclient)
+target_link_libraries(BSQL libmariadbclient)
 endif()
 
 add_precompiled_header(BSQL BSQL.h FORCEINCLUDE)
