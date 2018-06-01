@@ -26,7 +26,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-find_path(MARIA_INCLUDE_DIR mysql/mysql.h PATHS "/usr/include/")
+find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql")
 endif()
 
 include_directories(${MARIA_INCLUDE_DIR})
