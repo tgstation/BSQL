@@ -1,5 +1,5 @@
 /world/proc/_BSQL_Internal_Call(func, ...)
-	return call(_BSQL_Library_Path(), func)(arglist(args.Copy(1)))
+	return call(_BSQL_Library_Path(), func)(arglist(args.Copy(2)))
 
 /world/proc/_BSQL_Library_Path()
 	return system_type == MS_WINDOWS ? "BSQL.dll" : "libBSQL.so"
