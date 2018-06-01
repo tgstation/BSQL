@@ -16,7 +16,7 @@ addons:
       - g++-7
       - gcc-7-multilib
       - libstdc++6:i386
-      - libmariadbclient:i386
+      - libmariadbclient-dev:i386
 env:
   - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 services:
