@@ -246,7 +246,7 @@ extern "C" {
 		if (argumentCount != 2)
 			return nullptr;
 		const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
-		if (!connectionIdentifier || !!operationIdentifier)
+		if (!connectionIdentifier || !operationIdentifier)
 			return nullptr;
 		try {
 			auto connection(library->GetConnection(lastCreatedOperationConnectionId));
