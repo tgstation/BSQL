@@ -11,20 +11,19 @@ cache:
 addons:
   apt:
     sources:
-      - llvm-toolchain-trusty-5.0
       - ubuntu-toolchain-r-test
     packages:
       - g++-7
-      - clang-5.0
+      - gcc-7-multilib
 env:
   - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 services:
   - mysql
 install:
   - eval "${MATRIX_EVAL}"
-  - cd $HOME && git clone --depth=1 https://github.com/Microsoft/vcpkg
-  - cd $HOME/vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg integrate install && ./vcpkg install libmariadb:x86-linux
-  - build/install_byond.sh
+  - git clone --depth=1 https://github.com/MariaDB/mariadb-connector-c
+  - cd mariadb-connector-c && cmake . -D CMAKE_C_FLAGS="-m32" && make install && cd ..
 script:
-  - mkdir artifacts && cd artifacts && cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake && make test
+  - mkdir artifacts && cd artifacts && cmake .. -DCMAKE_CXX_FLAGS="-m32" && make test && cd ..
+  - cp artifacts/BSQL.so tests/
   - cd tests && ./test_byond.sh
