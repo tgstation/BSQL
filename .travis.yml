@@ -15,9 +15,8 @@ addons:
     packages:
       - g++-7
       - gcc-7-multilib
-      - linux-libc-dev:i386
       - libstdc++6:i386
-      - libssl-dev:i386
+      - libmariadbclient:i386
 env:
   - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 services:
@@ -25,6 +24,6 @@ services:
 install:
   - eval "${MATRIX_EVAL}"
 script:
-  - mkdir artifacts && cd artifacts && export LDFLAGS=-m32 && cmake .. -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32" && make test && cd ..
+  - mkdir artifacts && cd artifacts && cmake .. -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32" && make test && cd ..
   - cp artifacts/BSQL.so tests/
   - cd tests && ./test_byond.sh
