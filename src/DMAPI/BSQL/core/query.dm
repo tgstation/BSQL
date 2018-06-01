@@ -19,7 +19,8 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation/Query)
 		if("DONE")
 			//load the data
 			last_result_json = world._BSQL_Internal_Call("GetRow", connection.id, id)
-			last_result = json_decode(last_result_json)
+			if(last_result_json)
+				last_result = json_decode(last_result_json)
 			return TRUE
 		if("NOTDONE")
 			return FALSE
