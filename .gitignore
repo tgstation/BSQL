@@ -261,3 +261,6 @@ __pycache__/
 *.pyc
 
 CMakeSettings.json
+/tests/travistester.dmb
+/tests/libmariadb.dll
+/tests/BSQL.dll
