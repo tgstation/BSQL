@@ -18,13 +18,6 @@ find_library(MARIA_LIBRARY libmariadb)
 find_path(MARIA_INCLUDE_DIR mysql/mysql.h)
 else() #system package
 set_target_properties(BSQL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
-set(CMAKE_FIND_ROOT_PATH /usr/lib32)# adjust the default behaviour of the FIND_XXX() commands:
-# search headers and libraries in the target environment, search
-# programs in the host environment
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
 find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql")
 find_library(MARIA_LIBRARY NAMES "libmariadbclient" PATHS "/usr/lib/i386-linux-gnu")
 endif()
