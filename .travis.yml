@@ -22,7 +22,7 @@ services:
 install:
   - eval "${MATRIX_EVAL}"
   - git clone --depth=1 https://github.com/MariaDB/mariadb-connector-c
-  - cd mariadb-connector-c && cmake . -D CMAKE_C_FLAGS="-m32" && make install && cd ..
+  - cd mariadb-connector-c && cmake . -DCMAKE_C_FLAGS="-m32" && make install && cd ..
 script:
   - mkdir artifacts && cd artifacts && cmake .. -DCMAKE_CXX_FLAGS="-m32" && make test && cd ..
   - cp artifacts/BSQL.so tests/
