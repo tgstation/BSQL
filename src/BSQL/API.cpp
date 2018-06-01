@@ -277,10 +277,11 @@ extern "C" {
 		auto res(TryLoadQuery(argumentCount, args, &query));
 		if (res != nullptr)
 			return res;
-		if (query->IsComplete())
-			try {
-			lastRow = query->CurrentRow();
-			return "DONE";
+		try {
+			if (query->IsComplete()) {
+				lastRow = query->CurrentRow();
+				return "DONE";
+			}
 		}
 		catch (std::bad_alloc&) {
 			return "Out of memory!";
