@@ -5,6 +5,7 @@ env:
   global:
     - BYOND_MAJOR="511"
     - BYOND_MINOR="1385"
+    - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 cache:
   directories:
     - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
@@ -19,8 +20,6 @@ addons:
       - libc6-i386
       - libstdc++6:i386
       - libmariadbclient-dev:i386
-env:
-  - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 services:
   - mysql
 install:
