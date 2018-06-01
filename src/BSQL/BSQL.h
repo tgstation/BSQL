@@ -1,7 +1,7 @@
 ﻿#ifdef _MSC_VER
 #define BYOND_FUNC __declspec(dllexport) const char* _cdecl
 #else
-#define BYOND_FUNC __attribute__((visibility("default"))) const char* _cdecl
+#define BYOND_FUNC __attribute__((visibility("default"))) const char*
 #endif
 
 #include <mysql/mysql.h>
