@@ -2,7 +2,7 @@
 	return call(_BSQL_Library_Path(), func)(arglist(args.Copy(1)))
 
 /world/proc/_BSQL_Library_Path()
-	return system_type == MS_WINDOWS ? "BSQL.dll" : "BSQL.so"
+	return system_type == MS_WINDOWS ? "BSQL.dll" : "libBSQL.so"
 
 /world/proc/_BSQL_InitCheck(datum/BSQL_Connection/caller)
 	var/static/library_initialized = FALSE
