@@ -27,5 +27,7 @@ install:
   - eval "${MATRIX_EVAL}"
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
-  - cp artifacts/libBSQL.so tests/
+  - ls artifacts
+  - ls artifacts/BSQL
+  - cp artifacts/libBSQL/libBSQL.so tests/
   - cd tests && ./test_byond.sh
