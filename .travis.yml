@@ -15,6 +15,7 @@ addons:
     packages:
       - g++-7
       - gcc-7-multilib
+      - lib32stdc++6
       - libstdc++6:i386
       - libmariadbclient-dev:i386
 env:
