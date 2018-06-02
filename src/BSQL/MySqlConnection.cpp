@@ -34,13 +34,9 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 bool MySqlConnection::LoadNewConnection() {
 	if (newestConnectionAttempt)
 		//this will chain into calling ReleaseConnection and clear the var
-		return newestConnectionAttempt->IsComplete();
+		return newestConnectionAttempt->IsComplete() && availableConnections.size() > 0;
 
-	auto mysql(mysql_init(nullptr));
-	if (mysql == nullptr)
-		throw std::bad_alloc();
-	mysql_options(mysql, MYSQL_OPT_NONBLOCK, 0);
-	auto newCon(std::make_unique<MySqlConnectOperation>(*this, mysql, address, port, username, password));
+	auto newCon(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password));
 	newestConnectionAttempt = newCon.get();
 	AddOp(std::move(newCon));
 
@@ -64,6 +60,20 @@ MYSQL* MySqlConnection::RequestConnection() {
 
 void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 	availableConnections.emplace(connection);
-	if (newestConnectionAttempt && newestConnectionAttempt->IsComplete())
+	if (newestConnectionAttempt) {
+		auto tmp(newestConnectionAttempt);
 		newestConnectionAttempt = nullptr;
+		if (!tmp->IsComplete())
+			newestConnectionAttempt = tmp;
+	}
+}
+
+bool MySqlConnection::ReleaseOperation(const std::string& identifier) {
+	auto op(GetOperation(identifier));
+	if (op && op == newestConnectionAttempt)
+		newestConnectionAttempt = nullptr;
+	auto result(Connection::ReleaseOperation(identifier));
+	if (availableConnections.empty())
+		LoadNewConnection();
+	return result;
 }

@@ -58,13 +58,8 @@ Gets an associated list of column name -> value representation of the most recen
 /datum/BSQL_Operation/Query/proc/CurrentRow()
 	return
 
-/*
-Starts a fetch of the next query in the result set. Only valid if IsComplete() returns TRUE. IsComplete() will return FALSE after this is called
-*/
-/datum/BSQL_Operation/Query/proc/BeginFetchNextRow()
-	return
 
-/* 
+/*
 Code configuration options below
 
 Define this to avoid modifying this file but the following defines must be declared somewhere else before BSQL/includes.dm is included

@@ -28,14 +28,23 @@
 	world.log << "Connect op id: [connectOp.id]"
 
 	WaitOp(connectOp)
+	var/error = connectOp.GetError()
+	if(error)
+		CRASH(error)
 	del(connectOp)
 	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("CREATE DATABASE BSQLTest; USE BSQLTest");
 	world.log << "Create db op id: [q.id]"
 	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH(error)
 	
 	q = conn.BeginQuery("CREATE TABLE `asdf` (`id` int(11) NOT NULL AUTO_INCREMENT, `datetime` datetime NOT NULL, `round_id` int(11) unsigned NOT NULL, PRIMARY KEY (`id`))")
 	world.log << "Create table op id: [q.id]"
 	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH(error)
 	
 	q = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES (NOW(), 42)")
 	world.log << "Insert 1 op id: [q.id]"
@@ -44,14 +53,20 @@
 	world.log << "Insert 2 op id: [q2.id]"
 
 	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH(error)
 	WaitOp(q2)
+	error = q2.GetError()
+	if(error)
+		CRASH(error)
 	del(q2)
 	
 	world.log << "Select op id: [q.id]"
 	q = conn.BeginQuery("SELECT * FROM asdf")
 	WaitOp(q)
 
-	var/error = q.GetError()
+	error = q.GetError()
 	if(error)
 		CRASH(error)
 
@@ -64,7 +79,6 @@
 	if(results.len != 3)
 		CRASH("Expected 3 columns, got [results.len]!")
 
-	q.BeginFetchNextRow()
 	WaitOp(q)
 	error = q.GetError()
 	if(error)
@@ -78,7 +92,6 @@
 	if(results.len != 3)
 		CRASH("Second row: Expected 3 columns, got [results.len]!")
 
-	q.BeginFetchNextRow()
 	WaitOp(q)
 	error = q.GetError()
 	if(error)

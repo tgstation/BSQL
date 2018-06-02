@@ -7,11 +7,6 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation/Query)
 /datum/BSQL_Operation/Query/CurrentRow()
 	return last_result
 
-/datum/BSQL_Operation/Query/BeginFetchNextRow()
-	var/error = world._BSQL_Internal_Call("BeginFetchNextRow", connection.id, id)
-	if(error)
-		BSQL_ERROR(error)
-
 /datum/BSQL_Operation/Query/IsComplete()
 	//whole different ballgame here
 	var/result = world._BSQL_Internal_Call("ReadyRow", connection.id, id)
@@ -21,6 +16,8 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation/Query)
 			last_result_json = world._BSQL_Internal_Call("GetRow", connection.id, id)
 			if(last_result_json)
 				last_result = json_decode(last_result_json)
+			else
+				last_result = null
 			return TRUE
 		if("NOTDONE")
 			return FALSE

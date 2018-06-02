@@ -17,6 +17,7 @@ public:
 	MySqlConnection();
 	~MySqlConnection() override;
 
+	bool ReleaseOperation(const std::string& identifier) override;
 	std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password) override;
 	std::string CreateQuery(const std::string& queryText) override;
 

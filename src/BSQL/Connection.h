@@ -20,7 +20,7 @@ public:
 	virtual ~Connection() = default;
 
 	Operation* GetOperation(const std::string& identifier);
-	bool ReleaseOperation(const std::string& identifier);
+	virtual bool ReleaseOperation(const std::string& identifier);
 
 	virtual std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password) = 0;
 

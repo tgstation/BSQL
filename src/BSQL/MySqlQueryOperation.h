@@ -16,6 +16,4 @@ public:
 	~MySqlQueryOperation() override;
 
 	bool IsComplete() override;
-
-	bool BeginGetNextRow() override;
 };

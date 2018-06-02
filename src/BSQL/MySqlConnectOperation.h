@@ -7,7 +7,7 @@ private:
 
 	bool complete;
 public:
-	MySqlConnectOperation(MySqlConnection& connPool, MYSQL* const mysql, const std::string& address, const unsigned short port, const std::string& username, const std::string& password);
+	MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password);
 	MySqlConnectOperation(const MySqlConnectOperation&) = delete;
 	MySqlConnectOperation(MySqlConnectOperation&&) = delete;
 	~MySqlConnectOperation() override;

@@ -72,7 +72,8 @@ extern "C" {
 				return "Operation identifier does not exist!";
 			if (!operation->IsComplete())
 				return "Operation is not complete!";
-			return operation->GetError().c_str();
+			returnValueHolder = operation->GetError();
+			return returnValueHolder.c_str();
 		}
 		catch (std::bad_alloc&) {
 			return "Out of memory!";
@@ -287,15 +288,5 @@ extern "C" {
 			return "Out of memory!";
 		}
 		return "NOTDONE";
-	}
-
-	BYOND_FUNC BeginFetchNextRow(const int argumentCount, const char* const* const args) noexcept {
-		Query* query;
-		auto res(TryLoadQuery(argumentCount, args, &query));
-		if (res != nullptr)
-			return res;
-		if (!query->BeginGetNextRow())
-			return "Query in progress!";
-		return nullptr;
 	}
 }
