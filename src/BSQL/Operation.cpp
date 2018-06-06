@@ -1,7 +1,7 @@
 #include "BSQL.h"
 
 std::string Operation::GetError() {
-	if (!IsComplete())
+	if (!IsComplete(true))
 		return std::string();
 	return error;
 }

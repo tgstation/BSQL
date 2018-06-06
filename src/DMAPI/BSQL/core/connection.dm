@@ -7,12 +7,7 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Connection)
 /datum/BSQL_Connection/New(connection_type)
 	src.connection_type = connection_type
 
-	if(!world._BSQL_Initialized())
-		var/result = world._BSQL_Internal_Call("Initialize")
-		if(result)
-			BSQL_ERROR(result)
-			return
-		world._BSQL_Initialized(TRUE)
+	world._BSQL_InitCheck(src)
 
 	var/error = world._BSQL_Internal_Call("CreateConnection", connection_type)
 	if(error)
@@ -31,8 +26,8 @@ BSQL_DEL_PROC(/datum/BSQL_Connection)
 	if(error)
 		BSQL_ERROR(error)
 
-/datum/BSQL_Connection/BeginConnect(ipaddress, port, username, password)
-	var/error = world._BSQL_Internal_Call("OpenConnection", id, ipaddress, "[port]", username, password)
+/datum/BSQL_Connection/BeginConnect(ipaddress, port, username, password, database)
+	var/error = world._BSQL_Internal_Call("OpenConnection", id, ipaddress, "[port]", username, password, database)
 	if(error)
 		BSQL_ERROR(error)
 		return

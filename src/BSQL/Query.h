@@ -7,6 +7,4 @@ public:
 	std::string CurrentRow() const;
 
 	bool IsQuery() override;
-
-	virtual bool BeginGetNextRow() = 0;
 };

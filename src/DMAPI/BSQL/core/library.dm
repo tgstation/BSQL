@@ -1,5 +1,25 @@
 /world/proc/_BSQL_Internal_Call(func, ...)
-	return call(system_type == MS_WINDOWS ? "BSQL.dll" : "BSQL.so", func)(arglist(args.Copy(1)))
+	return call(_BSQL_Library_Path(), func)(arglist(args.Copy(2)))
+
+/world/proc/_BSQL_Library_Path()
+	return system_type == MS_WINDOWS ? "BSQL.dll" : "libBSQL.so"
+
+/world/proc/_BSQL_InitCheck(datum/BSQL_Connection/caller)
+	var/static/library_initialized = FALSE
+	if(_BSQL_Initialized())
+		return
+	var/libPath = _BSQL_Library_Path()
+	if(!fexists(libPath))
+		BSQL_DEL_CALL(caller)
+		BSQL_ERROR("Could not find [libPath]!")
+		return
+
+	var/result = _BSQL_Internal_Call("Initialize")
+	if(result)
+		BSQL_DEL_CALL(caller)
+		BSQL_ERROR(result)
+		return
+	_BSQL_Initialized(TRUE)
 
 /world/proc/_BSQL_Initialized(new_val)
 	var/static/bsql_library_initialized = FALSE
@@ -8,5 +28,5 @@
 	return bsql_library_initialized
 
 /world/BSQL_Shutdown()
-	BSQL_Internal_Call("Shutdown")
+	_BSQL_Internal_Call("Shutdown")
 	_BSQL_Initialized(FALSE)
