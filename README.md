@@ -32,4 +32,8 @@ Install the c++ build chain for your operating system as well as [CMake](https:/
 
 To integrate BSQL into your DM project, build it [or download a windows release](https://github.com/tgstation/BSQL/releases) and drop the libmariadb and BSQL binaries in the root of your project folder. Then include the DMAPI (under `src/DMAPI`) in your project. Only include `BSQL.dm` and `BSQL/includes.dm` for maximum future compatibility. Modify the configuration options in `BSQL.dm` to your needs or create and include [seperate config file](https://github.com/Cyberboss/tgstation/blob/105fd3f6fbd59c5e21e77cb98769a89ea81de131/code/__DEFINES/bsql.config.dm). Follow the comments in `BSQL.dm` for further instructions
 
-#### Waiting for @praisenarsie to make his obligatory License PR
+## LICENSE
+
+This project is licensed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
+
+See LICENSE for more details.
