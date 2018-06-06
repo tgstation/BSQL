@@ -18,7 +18,7 @@ Install the c++ build chain for your operating system as well as [CMake](https:/
 	- Run `cmake` with the option `-DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake` 
 	- Open and build `BSQL.sln`
 - Option 2: [VS Command Line Build Tools](https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017) (Requires CMake 3.8 or higher)
-    - Acquire libmariadb header files in one folder and the .lib, and .dll in another
+    - Acquire libmariadb header files in one folder and the .lib, and .dll in another (available [here](https://downloads.mariadb.org/connector-c))
 	- Run `cmake` with the options `-DMARIA_LIBRARY:FILEPATH="C:/path/to/libmariadb.lib" -DMARIA_INCLUDE_DIR:PATH="C:/path/to/headers"` (`/path/to/headers` is the folder that contains the `mysql` include FOLDER)
 	- Run `msbuild BSQL.sln`
 
