@@ -11,7 +11,7 @@ MySqlConnection::~MySqlConnection() {
 	operations.clear();
 	//and release them
 	while (!availableConnections.empty()) {
-		auto front(availableConnections.front());
+		auto front(availableConnections.top());
 		mysql_close(front);
 		if (front == firstSuccessfulConnection)
 			firstSuccessfulConnection = nullptr;
@@ -57,7 +57,7 @@ MYSQL* MySqlConnection::RequestConnection() {
 	if (availableConnections.empty() && !LoadNewConnection())
 		return nullptr;
 
-	auto front(availableConnections.front());
+	auto front(availableConnections.top());
 	availableConnections.pop();
 	if (availableConnections.empty())
 		LoadNewConnection();

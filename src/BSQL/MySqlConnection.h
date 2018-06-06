@@ -10,7 +10,7 @@ private:
 	std::string database;
 	unsigned short port;
 
-	std::queue<MYSQL*> availableConnections;
+	std::stack<MYSQL*> availableConnections;
 	MYSQL* firstSuccessfulConnection;
 	MySqlConnectOperation* newestConnectionAttempt;
 private:

@@ -39,6 +39,8 @@ Properly quotes a string for use by the database. The connection must be open fo
 Starts an operation for a query
   query: The text of the query. Only one query allowed per invocation, no semicolons
  Returns: A /datum/BSQL_Operation/Query representing the running query and subsequent result set or null if an error occurred
+
+ Note for MariaDB: The underlying connection is pooled. In order to use connection state based properties (i.e. LAST_INSERT_ID()) you can guarantee multiple queries will use the same connection by running BSQL_DEL_CALL(query) on the finished /datum/BSQL_Operation/Query and then creating the next one with another call to BeginQuery() with no sleeps in between
 */
 /datum/BSQL_Connection/proc/BeginQuery(query)
 	return
