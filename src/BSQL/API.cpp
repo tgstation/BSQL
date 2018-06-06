@@ -289,4 +289,27 @@ extern "C" {
 		}
 		return "NOTDONE";
 	}
+
+	BYOND_FUNC QuoteString(const int argumentCount, const char* const* const args) noexcept {
+		if (argumentCount != 2)
+			return nullptr;
+		auto connectionIdentifier(args[0]), str(args[1]);
+		if (!connectionIdentifier || !str || !library)
+			return nullptr;
+
+		try {
+			//clear the cache
+			auto connection(library->GetConnection(connectionIdentifier));
+			if (!connection)
+				return nullptr;
+			returnValueHolder = connection->Quote(str);
+			return returnValueHolder.c_str();
+		}
+		catch (std::bad_alloc&) {
+			return nullptr;
+		}
+		catch (std::runtime_error&) {
+			return nullptr;
+		}
+	}
 }

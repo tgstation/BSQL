@@ -28,6 +28,14 @@ Starts an operation to connect to a database. Should only have 1 successful call
 	return
 
 /*
+Properly quotes a string for use by the database. The connection must be open for this proc to succeed
+  str: The string to quote
+ Returns: The string quoted on success, null on error
+*/
+/datum/BSQL_Connection/proc/Quote(str)
+	return
+
+/*
 Starts an operation for a query
   query: The text of the query. Only one query allowed per invocation, no semicolons
  Returns: A /datum/BSQL_Operation/Query representing the running query and subsequent result set or null if an error occurred

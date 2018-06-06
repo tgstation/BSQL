@@ -25,4 +25,6 @@ public:
 	virtual std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) = 0;
 
 	virtual std::string CreateQuery(const std::string& queryText) = 0;
+
+	virtual std::string Quote(const std::string& str) = 0;
 };

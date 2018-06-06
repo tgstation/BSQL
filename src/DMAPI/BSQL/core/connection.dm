@@ -52,3 +52,10 @@ BSQL_DEL_PROC(/datum/BSQL_Connection)
 		return
 
 	return new /datum/BSQL_Operation/Query(src, op_id)
+	
+/datum/BSQL_Connection/Quote(str)
+	if(!str)
+		return null;
+	. = world._BSQL_Internal_Call("QuoteString", id, "[str]")
+	if(!.)
+		BSQL_ERROR("Library failed to provide quote for [str]!")

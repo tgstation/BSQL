@@ -23,7 +23,7 @@ MySqlQueryOperation::~MySqlQueryOperation() {
 		}
 		//can't save it
 		catch (std::bad_alloc&) {
-			mysql_close(connection);
+			connPool.KillConnection(connection);
 			connection = nullptr;
 		}
 		if (result)

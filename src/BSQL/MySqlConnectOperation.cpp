@@ -28,7 +28,7 @@ bool MySqlConnectOperation::IsComplete(bool noOps) {
 	if (complete) {
 		if (!ret) {
 			error = "mysql_real_connect() returns error: " + std::string(mysql_error(mysql));
-			mysql_close(mysql);
+			mysql_close(mysql);	//don't use connPool Kill since it's never seen this connection
 		}
 		else
 			connPool.ReleaseConnection(mysql);

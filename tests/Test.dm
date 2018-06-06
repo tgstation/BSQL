@@ -4,6 +4,7 @@
 
 /world/Error()
 	. = ..()
+	fdel("clean_run.lk")
 	del(src)
 
 /proc/TestStart()
@@ -40,14 +41,23 @@
 		CRASH(error)
 	del(connectOp)
 
-	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("DROP DATABASE IF EXISTS [db]");
+	var/quoted_db = conn.Quote(db)
+	world.log << "Db quoted: [quoted_db]"
+
+	var/other_quote_test = "m'brapper"
+	var/quote_test = conn.Quote(other_quote_test)
+	if(other_quote_test == quote_test)
+		CRASH("Failed to quote \"[other_quote_test]\"! Got: \"[quote_test]\"")
+	world.log << "Quoted \"[other_quote_test]\" to \"[quote_test]\""
+
+	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("DROP DATABASE IF EXISTS [quoted_db]");
 	world.log << "Drop db op id: [q.id]"
 	WaitOp(q)
 	error = q.GetError()
 	if(error)
 		CRASH(error)
 
-	q = conn.BeginQuery("CREATE DATABASE [db]");
+	q = conn.BeginQuery("CREATE DATABASE [quoted_db]");
 	world.log << "Create db op id: [q.id]"
 	WaitOp(q)
 	error = q.GetError()
