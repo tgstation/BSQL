@@ -10,7 +10,7 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation)
 
 BSQL_DEL_PROC(/datum/BSQL_Operation)
 	var/error
-	if(BSQL_IS_DELETED(connection))
+	if(!BSQL_IS_DELETED(connection))
 		error = world._BSQL_Internal_Call("ReleaseOperation", connection.id, id)
 	. = ..()
 	if(error)
