@@ -16,7 +16,7 @@ MySqlConnection::~MySqlConnection() {
 	}
 }
 
-std::string MySqlConnection::Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password) {
+std::string MySqlConnection::Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) {
 	//can't connect twice
 	if (!operations.empty() || !availableConnections.empty())
 		return std::string();
@@ -25,6 +25,7 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 	this->port = port;
 	this->username = username;
 	this->password = password;
+	this->database = database;
 
 	LoadNewConnection();
 
@@ -34,9 +35,9 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 bool MySqlConnection::LoadNewConnection() {
 	if (newestConnectionAttempt)
 		//this will chain into calling ReleaseConnection and clear the var
-		return newestConnectionAttempt->IsComplete() && availableConnections.size() > 0;
+		return newestConnectionAttempt->IsComplete(false) && availableConnections.size() > 0;
 
-	auto newCon(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password));
+	auto newCon(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password, database));
 	newestConnectionAttempt = newCon.get();
 	AddOp(std::move(newCon));
 
@@ -63,7 +64,7 @@ void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 	if (newestConnectionAttempt) {
 		auto tmp(newestConnectionAttempt);
 		newestConnectionAttempt = nullptr;
-		if (!tmp->IsComplete())
+		if (!tmp->IsComplete(false))
 			newestConnectionAttempt = tmp;
 	}
 }

@@ -70,7 +70,7 @@ extern "C" {
 			auto operation(connection->GetOperation(operationIdentifier));
 			if (!operation)
 				return "Operation identifier does not exist!";
-			if (!operation->IsComplete())
+			if (!operation->IsComplete(true))
 				return "Operation is not complete!";
 			returnValueHolder = operation->GetError();
 			return returnValueHolder.c_str();
@@ -91,9 +91,9 @@ extern "C" {
 			std::string conType(connectionType);
 			if (conType == "MySql")
 				type = Connection::Type::MySql;
-			//TODO
-			//else if (conType == "SqlServer")
-			//	type = Connection::Type::SqlServer;
+			else if (conType == "SqlServer")
+				//type = Connection::Type::SqlServer;
+				return "SqlServer is not supported in this release!";
 			else
 				return "Invalid connection type!";
 		}
@@ -171,9 +171,9 @@ extern "C" {
 	}
 
 	BYOND_FUNC OpenConnection(const int argumentCount, const char* const* const args) noexcept {
-		if (argumentCount != 5)
+		if (argumentCount != 6)
 			return "Invalid arguments!";
-		const auto& connectionIdentifier(args[0]), ipaddress(args[1]), port(args[2]), username(args[3]), password(args[4]);
+		const auto& connectionIdentifier(args[0]), ipaddress(args[1]), port(args[2]), username(args[3]), password(args[4]), database(args[5]);
 
 		if (!connectionIdentifier)
 			return "Invalid connection identifier!";
@@ -209,7 +209,7 @@ extern "C" {
 			auto connection(library->GetConnection(lastCreatedOperationConnectionId));
 			if (!connection)
 				return "Connection identifier does not exist!";
-			lastCreatedOperation = connection->Connect(ipaddress, realPort, username, password);
+			lastCreatedOperation = connection->Connect(ipaddress, realPort, username, password, database);
 			return nullptr;
 		}
 		catch (std::bad_alloc&) {
@@ -256,7 +256,7 @@ extern "C" {
 			auto operation(connection->GetOperation(operationIdentifier));
 			if (!operation)
 				return nullptr;
-			return operation->IsComplete() ? "DONE" : "NOTDONE";
+			return operation->IsComplete(true) ? "DONE" : "NOTDONE";
 		}
 		catch (std::bad_alloc&) {
 			return "Out of memory!";
@@ -279,7 +279,7 @@ extern "C" {
 		if (res != nullptr)
 			return res;
 		try {
-			if (query->IsComplete()) {
+			if (query->IsComplete(false)) {
 				lastRow = query->CurrentRow();
 				return "DONE";
 			}

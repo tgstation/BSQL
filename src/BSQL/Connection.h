@@ -22,7 +22,7 @@ public:
 	Operation* GetOperation(const std::string& identifier);
 	virtual bool ReleaseOperation(const std::string& identifier);
 
-	virtual std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password) = 0;
+	virtual std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) = 0;
 
 	virtual std::string CreateQuery(const std::string& queryText) = 0;
 };

@@ -264,3 +264,4 @@ CMakeSettings.json
 /tests/travistester.dmb
 /tests/libmariadb.dll
 /tests/BSQL.dll
+/tests/clean_run.lk

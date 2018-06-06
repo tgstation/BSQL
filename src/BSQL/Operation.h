@@ -9,6 +9,6 @@ public:
 
 	std::string GetError();
 
-	virtual bool IsComplete() = 0;
+	virtual bool IsComplete(bool noOps) = 0;
 	virtual bool IsQuery() = 0;
 };

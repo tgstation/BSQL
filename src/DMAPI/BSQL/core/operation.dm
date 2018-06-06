@@ -9,7 +9,9 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation)
 	src.id = id
 
 BSQL_DEL_PROC(/datum/BSQL_Operation)
-	var/error = world._BSQL_Internal_Call("ReleaseOperation", connection.id, id)
+	var/error
+	if(connection)
+		error = world._BSQL_Internal_Call("ReleaseOperation", connection.id, id)
 	. = ..()
 	if(error)
 		BSQL_ERROR(error)

@@ -26,8 +26,8 @@ BSQL_DEL_PROC(/datum/BSQL_Connection)
 	if(error)
 		BSQL_ERROR(error)
 
-/datum/BSQL_Connection/BeginConnect(ipaddress, port, username, password)
-	var/error = world._BSQL_Internal_Call("OpenConnection", id, ipaddress, "[port]", username, password)
+/datum/BSQL_Connection/BeginConnect(ipaddress, port, username, password, database)
+	var/error = world._BSQL_Internal_Call("OpenConnection", id, ipaddress, "[port]", username, password, database)
 	if(error)
 		BSQL_ERROR(error)
 		return

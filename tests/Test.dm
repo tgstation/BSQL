@@ -17,14 +17,21 @@
 /proc/WaitOp(datum/BSQL_Operation/op)
 	world.log << "Waiting on op [op.id] (conn: [op.connection.id])"
 	while(!op.IsComplete())
-		sleep(10)
+		sleep(1)
 	world.log << "Op [op.id] (conn: [op.connection.id]) complete"
 
 /proc/Test()
 	world.log << "Beginning test"
+
+	var/host = world.params["dbhost"]
+	var/user = world.params["dbuser"]
+	var/port = text2num(world.params["dbport"])
+	var/pass = world.params["dbpass"]
+	var/db = world.params["dbdb"]
+
 	var/datum/BSQL_Connection/conn = new(BSQL_CONNECTION_TYPE_MARIADB)
-	world.log << "Connection id: [conn.id]"
-	var/datum/BSQL_Operation/connectOp = conn.BeginConnect(world.params["dbaddr"], text2num(world.params["dbport"]), world.params["dbuser"], world.params["dbpass"])
+	world.log << "Root connection id: [conn.id]"
+	var/datum/BSQL_Operation/connectOp = conn.BeginConnect(host, port, user, pass, null)
 	world.log << "Connect op id: [connectOp.id]"
 
 	WaitOp(connectOp)
@@ -32,10 +39,27 @@
 	if(error)
 		CRASH(error)
 	del(connectOp)
-	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("CREATE DATABASE BSQLTest; USE BSQLTest");
+
+	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("DROP DATABASE IF EXISTS BSQLTest");
+	world.log << "Drop db op id: [q.id]"
+	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH(error)
+
+	q = conn.BeginQuery("CREATE DATABASE BSQLTest");
 	world.log << "Create db op id: [q.id]"
 	WaitOp(q)
 	error = q.GetError()
+	if(error)
+		CRASH(error)
+
+	conn = new(BSQL_CONNECTION_TYPE_MARIADB)
+	world.log << "Db connection id: [conn.id]"
+	connectOp = conn.BeginConnect(host, port, user, pass, db)
+	world.log << "Db connect op id: [connectOp.id]"
+	WaitOp(connectOp)
+	error = connectOp.GetError()
 	if(error)
 		CRASH(error)
 	
@@ -49,7 +73,7 @@
 	q = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES (NOW(), 42)")
 	world.log << "Insert 1 op id: [q.id]"
 	
-	var/datum/BSQL_Operation/Query/q2 = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES ([time2text(world.timeofday, "YYYY-MM-DD hh:mm:ss")], 77)")
+	var/datum/BSQL_Operation/Query/q2 = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES ('[time2text(world.timeofday, "YYYY-MM-DD hh:mm:ss")]', 77)")
 	world.log << "Insert 2 op id: [q2.id]"
 
 	WaitOp(q)
@@ -61,9 +85,9 @@
 	if(error)
 		CRASH(error)
 	del(q2)
-	
-	world.log << "Select op id: [q.id]"
+
 	q = conn.BeginQuery("SELECT * FROM asdf")
+	world.log << "Select op id: [q.id]"
 	WaitOp(q)
 
 	error = q.GetError()

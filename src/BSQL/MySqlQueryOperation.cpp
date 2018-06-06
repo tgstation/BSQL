@@ -16,8 +16,10 @@ MySqlQueryOperation::~MySqlQueryOperation() {
 		//must ensure everything is taken care of
 
 		try {
-			//is complete must return twice before we know the result set is empty
-			while (!IsComplete() || !IsComplete());
+			while (!complete) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				IsComplete(false);
+			}
 		}
 		//can't save it
 		catch (std::bad_alloc&) {
@@ -38,7 +40,7 @@ void MySqlQueryOperation::StartQuery() {
 	mysql_real_query_start(&queryError, connection, queryText.c_str(), queryText.length());
 }
 
-bool MySqlQueryOperation::IsComplete() {
+bool MySqlQueryOperation::IsComplete(bool noOps) {
 	if (complete)
 		return true;
 
@@ -70,17 +72,20 @@ bool MySqlQueryOperation::IsComplete() {
 				error = "mysql_use_result() returns error: " + std::string(mysql_error(connection));
 			return true;
 		}
-		mysql_fetch_row_start(&row, result);
-		return false;
+		if (mysql_fetch_row_start(&row, result) != 0)
+			return false;
+		else
+			waitNext = false;
+	}
+	
+	if(waitNext){
+		const auto status(mysql_fetch_row_cont(&row, result, 0));
+
+		if (status != 0)
+			return false;
 	}
 
-	const auto status(mysql_fetch_row_cont(&row, result, 0));
-
-	if (status)
-		return false;
-
 	if (row != nullptr) {
-		mysql_fetch_row_start(&row, result);
 		struct ColInfo {
 			std::string name;
 			enum_field_types type;
@@ -89,6 +94,7 @@ bool MySqlQueryOperation::IsComplete() {
 		std::string json("{");
 		bool first(true);
 		const auto numFields(mysql_num_fields(result));
+		mysql_field_seek(result, 0);
 		for (auto I(0U); I < numFields; ++I) {
 			const auto field(mysql_fetch_field(result));
 			if (first)
@@ -97,7 +103,7 @@ bool MySqlQueryOperation::IsComplete() {
 				json.append(",");
 			json.append("\"");
 			json.append(field->name);
-			json.append("\"");
+			json.append("\":");
 			if (row[I] == nullptr)
 				json.append("null");
 			else {
@@ -109,8 +115,18 @@ bool MySqlQueryOperation::IsComplete() {
 		json.append("}");
 
 		currentRow = std::move(json);
+
+		if(!noOps)
+			waitNext = mysql_fetch_row_start(&row, result) != 0;
 	}
-	else
+	else {
+		//resultless?
 		complete = true;
+		if (mysql_errno(connection))
+			//no it's an error
+			error = "mysql_fetch_row() returns error: " + std::string(mysql_error(connection));
+		else
+			currentRow = std::string();
+	}
 	return true;
 }

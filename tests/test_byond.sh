@@ -10,7 +10,7 @@ then
 	then
 		retval=1 #hard fail, due to warnings or errors
 	else
-		DreamDaemon travistester.dmb -close -trusted -params "dbaddr=127.0.0.1&dbport=3306&dbuser=root&dbpass="
+		DreamDaemon travistester.dmb -close -trusted -params "dbhost=127.0.0.1&dbport=3306&dbuser=root&dbpass=&dbdb=bsqltest"
 		cat clean_run.lk
 	fi
 else

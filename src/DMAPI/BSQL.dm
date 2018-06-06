@@ -21,14 +21,15 @@ Starts an operation to connect to a database. Should only have 1 successful call
   port: The port of the target server
   username: The username to login to the target server
   password: The password for the target server
+  database: Optional database to connect to. Must be used when trying to do database operations, `USE x` is not sufficient
  Returns: A /datum/BSQL_Operation representing the connection or null if an error occurred
 */
-/datum/BSQL_Connection/proc/BeginConnect(ipaddress, port, username, password)
+/datum/BSQL_Connection/proc/BeginConnect(ipaddress, port, username, password, database)
 	return
 
 /*
 Starts an operation for a query
-  query: The text of the query
+  query: The text of the query. Only one query allowed per invocation, no semicolons
  Returns: A /datum/BSQL_Operation/Query representing the running query and subsequent result set or null if an error occurred
 */
 /datum/BSQL_Connection/proc/BeginQuery(query)

@@ -7,6 +7,7 @@ private:
 	std::string address;
 	std::string username;
 	std::string password;
+	std::string database;
 	unsigned short port;
 
 	std::queue<MYSQL*> availableConnections;
@@ -18,7 +19,7 @@ public:
 	~MySqlConnection() override;
 
 	bool ReleaseOperation(const std::string& identifier) override;
-	std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password) override;
+	std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) override;
 	std::string CreateQuery(const std::string& queryText) override;
 
 	MYSQL* RequestConnection();
