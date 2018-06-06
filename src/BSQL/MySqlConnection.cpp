@@ -38,9 +38,16 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 }
 
 bool MySqlConnection::LoadNewConnection() {
-	if (newestConnectionAttempt)
+	if (newestConnectionAttempt) {
 		//this will chain into calling ReleaseConnection and clear the var
-		return newestConnectionAttempt->IsComplete(false) && availableConnections.size() > 0;
+		if (newestConnectionAttempt->IsComplete(false)) {
+			if (availableConnections.size() > 0)
+				return true;
+			newestConnectionAttempt = nullptr;
+		}
+		else
+			return false;
+	}
 
 	auto newCon(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password, database));
 	newestConnectionAttempt = newCon.get();
@@ -59,8 +66,6 @@ MYSQL* MySqlConnection::RequestConnection() {
 
 	auto front(availableConnections.top());
 	availableConnections.pop();
-	if (availableConnections.empty())
-		LoadNewConnection();
 	return front;
 }
 
