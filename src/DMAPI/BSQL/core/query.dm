@@ -9,6 +9,8 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation/Query)
 
 /datum/BSQL_Operation/Query/IsComplete()
 	//whole different ballgame here
+	if(BSQL_IS_DELETED(connection))
+		return TRUE
 	var/result = world._BSQL_Internal_Call("ReadyRow", connection.id, id)
 	switch(result)
 		if("DONE")

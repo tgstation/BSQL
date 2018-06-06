@@ -10,13 +10,15 @@ BSQL_PROTECT_DATUM(/datum/BSQL_Operation)
 
 BSQL_DEL_PROC(/datum/BSQL_Operation)
 	var/error
-	if(connection)
+	if(BSQL_IS_DELETED(connection))
 		error = world._BSQL_Internal_Call("ReleaseOperation", connection.id, id)
 	. = ..()
 	if(error)
 		BSQL_ERROR(error)
 
 /datum/BSQL_Operation/IsComplete()
+	if(BSQL_IS_DELETED(connection))
+		return TRUE
 	var/result = world._BSQL_Internal_Call("OpComplete", connection.id, id)
 	if(!result)
 		BSQL_ERROR("Error fetching operation [id] for connection [connection.id]!")
@@ -24,4 +26,6 @@ BSQL_DEL_PROC(/datum/BSQL_Operation)
 	return result == "DONE"
 
 /datum/BSQL_Operation/GetError()
+	if(BSQL_IS_DELETED(connection))
+		return "Connection deleted!"
 	return world._BSQL_Internal_Call("GetError", connection.id, id)

@@ -1,4 +1,4 @@
-//BSQL - DMAPI
+//BSQL - DMAPI v1.0.0.0
 
 //types of connections
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
@@ -72,6 +72,9 @@ Define this to avoid modifying this file but the following defines must be decla
 
 //The equivalent of calling del() in your codebase
 #define BSQL_DEL_CALL(obj) del(##obj)
+
+//Returns TRUE if an object is delete
+#define BSQL_IS_DELETED(obj) (obj == null)
 
 //Modify this to add protections to the connection and query datums
 #define BSQL_PROTECT_DATUM(path)

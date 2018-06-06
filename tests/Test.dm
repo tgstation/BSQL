@@ -40,14 +40,14 @@
 		CRASH(error)
 	del(connectOp)
 
-	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("DROP DATABASE IF EXISTS BSQLTest");
+	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("DROP DATABASE IF EXISTS [db]");
 	world.log << "Drop db op id: [q.id]"
 	WaitOp(q)
 	error = q.GetError()
 	if(error)
 		CRASH(error)
 
-	q = conn.BeginQuery("CREATE DATABASE BSQLTest");
+	q = conn.BeginQuery("CREATE DATABASE [db]");
 	world.log << "Create db op id: [q.id]"
 	WaitOp(q)
 	error = q.GetError()
