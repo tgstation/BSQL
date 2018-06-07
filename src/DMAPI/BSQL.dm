@@ -1,4 +1,4 @@
-//BSQL - DMAPI v1.0.2.0
+//BSQL - DMAPI v1.0.3.0
 
 //types of connections
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
@@ -62,7 +62,7 @@ Get the error message associated with an operation. Should not be used while IsC
 	return
 
 /*
-Gets an associated list of column name -> value representation of the most recent row in the query. Only valid if IsComplete() returns TRUE. If this returns null and no errors are present there are no more results in the query.
+Gets an associated list of column name -> value representation of the most recent row in the query. Only valid if IsComplete() returns TRUE. If this returns null and no errors are present there are no more results in the query. Important to note that once IsComplete() returns TRUE it must not be called again without checking this or the row values may be lost
 
  Returns: An associated list of column name -> value for the row. Values will always be either strings or null
 */
