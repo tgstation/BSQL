@@ -17,9 +17,9 @@ MySqlQueryOperation::~MySqlQueryOperation() {
 		//must ensure everything is taken care of
 
 		try {
-			while (!complete) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				IsComplete(false);
+			if (!IsComplete(false) || !complete) {
+				connPool.KillConnection(connection);
+				connection = nullptr;
 			}
 		}
 		//can't save it

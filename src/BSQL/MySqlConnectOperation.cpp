@@ -12,8 +12,8 @@ MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const st
 }
 
 MySqlConnectOperation::~MySqlConnectOperation() {
-	while (!IsComplete(false))
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	if (!IsComplete(false))
+		mysql_close(mysql);
 }
 
 bool MySqlConnectOperation::IsQuery() {

@@ -7,13 +7,11 @@
 #include <mysql/mysql.h>
 
 #include <atomic>
-#include <chrono>
 #include <deque>
 #include <map>
 #include <memory>
 #include <stack>
 #include <string>
-#include <thread>
 
 #include "Operation.h"
 #include "Query.h"
