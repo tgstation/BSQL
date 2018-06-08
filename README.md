@@ -8,19 +8,24 @@ This is a non-blocking SQL library for [BYOND](http://www.byond.com) games
 
 ## Building
 
-Install the c++ build chain for your operating system as well as [CMake](https://cmake.org).
+Install the c++ build chain for your operating system as well as [CMake](https://cmake.org). Remember that you must build the library as x86 (because BYOND)
 
 ### Windows
 
+- Install the [vcpkg](https://github.com/Microsoft/vcpkg) package manager (Example done in powershell)
+	- `git clone https://github.com/Microsoft/vcpkg`
+	- `cd vcpkg`
+	- `.\bootstrap-vcpkg.bat`
+	- `.\vcpkg.exe integrate install` (Accept admin prompt. Must restart shell after this)
+	
+- Install libmariadb with `.\vcpkg.exe install libmariadb:x86-windows`
+
 - Option 1: Visual Studio
-	- Install the [vcpkg](https://github.com/Microsoft/vcpkg) package manager
-	- `vcpkg install libmariadb:x86-windows`
-	- Run `cmake` with the option `-DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake` 
+	- Set up a [CMakeSettings.json](https://github.com/Microsoft/vcpkg/blob/master/docs/examples/using-sqlite.md#cmake-toolchain-file) in the project root with the path to the vcpkg toolchain file 
 	- Open and build `BSQL.sln`
 - Option 2: [VS Command Line Build Tools](https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017) (Requires CMake 3.8 or higher)
-    - Acquire libmariadb header files in one folder and the .lib, and .dll in another (available [here](https://downloads.mariadb.org/connector-c))
-	- Run `cmake` with the options `-DMARIA_LIBRARY:FILEPATH="C:/path/to/libmariadb.lib" -DMARIA_INCLUDE_DIR:PATH="C:/path/to/headers"` (`/path/to/headers` is the folder that contains the `mysql` include FOLDER)
-	- Run `msbuild BSQL.sln`
+	- Run `cmake -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake path/to/code/root`
+	- Run `C:/path/to/msbuild.exe BSQL.sln`
 
 ### Linux
 
