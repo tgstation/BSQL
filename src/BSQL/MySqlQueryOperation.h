@@ -8,6 +8,7 @@ private:
 	MYSQL_RES* result;
 	MYSQL_ROW row;
 	int queryError;
+	int connectFailCount;
 	bool complete, queryFinished, waitNext;
 private:
 	void StartQuery();

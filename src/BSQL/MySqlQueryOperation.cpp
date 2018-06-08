@@ -1,10 +1,11 @@
 #include "BSQL.h"
 
 MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&& queryText) :
-	queryText(queryText),
+	queryText(std::move(queryText)),
 	connPool(connPool),
-	connection(connPool.RequestConnection()),
+	connection(connPool.RequestConnection(queryText)),
 	result(nullptr),
+	connectFailCount(0),
 	complete(false),
 	queryFinished(false)
 {
@@ -45,7 +46,14 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 		return true;
 
 	if (!connection) {
-		connection = connPool.RequestConnection();
+		std::string fail;
+		connection = connPool.RequestConnection(fail);
+		if(!fail.empty())
+			if (++connectFailCount == 3) {
+				complete = true;
+				error = "Failed to establish connection from connection pool: " + fail;
+				return false;
+			}
 		StartQuery();
 		return false;
 	}
