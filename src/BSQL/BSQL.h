@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <deque>
+#include <limit>
 #include <map>
 #include <memory>
 #include <stack>
