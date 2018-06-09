@@ -59,7 +59,9 @@
 
 	q = conn.BeginQuery("CREATE DATABASE [quoted_db]");
 	world.log << "Create db op id: [q.id]"
-	WaitOp(q)
+	q.WaitForCompletion()
+	if(!q.IsComplete())
+		CRASH("Wait for completion didn't work!")
 	error = q.GetError()
 	if(error)
 		CRASH(error)
