@@ -312,4 +312,30 @@ extern "C" {
 			return nullptr;
 		}
 	}
+
+	BYOND_FUNC BlockOnOperation(const int argumentCount, const char* const* const args) noexcept {
+		if (argumentCount != 2)
+			return "Invalid arguments!";
+		const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+		if (!connectionIdentifier)
+			return "Invalid connection identifier!";
+		if (!operationIdentifier)
+			return "Invalid operation identifier!";
+		if (!library)
+			return "Library not initialized!";
+		try {
+			auto connection(library->GetConnection(connectionIdentifier));
+			if (!connection)
+				return "Connection identifier does not exist!";
+			auto op(connection->GetOperation(operationIdentifier));
+			if (!op)
+				return "Operation identifier does not exist!";
+			while (!op->IsComplete(false))
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			return nullptr;
+		}
+		catch (std::bad_alloc&) {
+			return "Out of memory!";
+		}
+	}
 }

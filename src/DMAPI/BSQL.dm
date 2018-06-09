@@ -44,13 +44,19 @@ Starts an operation for a query
 */
 /datum/BSQL_Connection/proc/BeginQuery(query)
 	return
-
+	
 /*
 Checks if the operation is complete. This, in some cases must be called multiple times with false return before a result is present regardless of timespan. For best performance check it once per tick
 
  Returns: TRUE if the operation is complete, FALSE if it's not, null on error
 */
 /datum/BSQL_Operation/proc/IsComplete()
+	return
+
+/*
+Blocks the entire game until the given operation completes. IsComplete should not be checked after calling this to avoid potential side effects
+*/
+/datum/BSQL_Operation/proc/WaitForCompletion()
 	return
 
 /*
