@@ -14,6 +14,9 @@ Query.cpp
 )
 
 if(WIN32) #vcpkg
+#use static crt
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 find_library(MARIA_LIBRARY libmariadb)
 find_path(MARIA_INCLUDE_DIR mysql/mysql.h)
 add_precompiled_header(BSQL BSQL.h FORCEINCLUDE)
