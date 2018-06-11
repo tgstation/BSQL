@@ -28,6 +28,10 @@
 		sleep(1)
 	world.log << "Op [op.id] (conn: [op.connection.id]) complete"
 
+/proc/DelOp(datum/BSQL_Operation/op)
+	world.log << "Deleting operation [op.id] (conn: [op.connection.id])"
+	del(op)
+
 /proc/Test()
 	world.log << "Beginning test"
 
@@ -46,7 +50,7 @@
 	var/error = connectOp.GetError()
 	if(error)
 		CRASH(error)
-	del(connectOp)
+	DelOp(connectOp)
 
 	var/quoted_db = conn.Quote(db)
 	world.log << "Db quoted: [quoted_db]"
@@ -63,6 +67,7 @@
 	error = q.GetError()
 	if(error)
 		CRASH(error)
+	DelOp(q)
 
 	q = conn.BeginQuery("CREATE DATABASE [quoted_db]");
 	world.log << "Create db op id: [q.id]"
@@ -72,6 +77,7 @@
 	error = q.GetError()
 	if(error)
 		CRASH(error)
+	DelOp(q)
 
 	conn = new(BSQL_CONNECTION_TYPE_MARIADB)
 	world.log << "Db connection id: [conn.id]"
@@ -81,6 +87,7 @@
 	error = connectOp.GetError()
 	if(error)
 		CRASH(error)
+	DelOp(connectOp)
 	
 	q = conn.BeginQuery("CREATE TABLE `asdf` (`id` int(11) NOT NULL AUTO_INCREMENT, `datetime` datetime NOT NULL, `round_id` int(11) unsigned NOT NULL, PRIMARY KEY (`id`))")
 	world.log << "Create table op id: [q.id]"
@@ -88,6 +95,7 @@
 	error = q.GetError()
 	if(error)
 		CRASH(error)
+	DelOp(q)
 	
 	q = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES (NOW(), 42)")
 	world.log << "Insert 1 op id: [q.id]"
@@ -103,15 +111,17 @@
 	error = q2.GetError()
 	if(error)
 		CRASH(error)
-	del(q2)
+	DelOp(q2)
+	DelOp(q)
 
 	q = conn.BeginQuery("SELECT * FROM asdf")
 	world.log << "Select op id: [q.id]"
 	WaitOp(q)
-
 	error = q.GetError()
 	if(error)
 		CRASH(error)
+	DelOp(q)
+
 
 	var/list/results = q.CurrentRow()
 	if(!results)
@@ -129,6 +139,7 @@
 	results = q.CurrentRow()
 	if(!results)
 		CRASH("No second results!")
+	DelOp(q)
 
 	world.log << json_encode(results)
 
@@ -143,8 +154,9 @@
 	results = q.CurrentRow()
 	if(results)
 		CRASH("Expected no third row! Got: [json_encode(results)] !")
+		
+	DelOp(q)
 
-	del(q)
 	del(conn)
 
 	world.BSQL_Shutdown()
