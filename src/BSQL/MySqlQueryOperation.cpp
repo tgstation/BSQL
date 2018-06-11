@@ -13,25 +13,23 @@ MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&
 }
 
 MySqlQueryOperation::~MySqlQueryOperation() {
-	if (connection) {
-		//must ensure everything is taken care of
-
-		try {
-			if (!IsComplete(false) || !complete) {
-				connPool.KillConnection(connection);
-				connection = nullptr;
-			}
-		}
-		//can't save it
-		catch (std::bad_alloc&) {
-			connPool.KillConnection(connection);
-			connection = nullptr;
-		}
-		if (result)
-			mysql_free_result(result);
-		if (connection)
-			connPool.ReleaseConnection(connection);
+	if (!connection)
+		return;
+	//must ensure everything is taken care of
+	bool kill;
+	try {
+		kill = !IsComplete(false) || !complete;
 	}
+	//can't save it
+	catch (std::bad_alloc&) {
+		kill = true;
+	}
+	if (result)
+		mysql_free_result(result);
+	if (kill)
+		connPool.KillConnection(connection);
+	else
+		connPool.ReleaseConnection(connection);
 }
 
 void MySqlQueryOperation::StartQuery() {

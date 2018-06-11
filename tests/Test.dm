@@ -33,7 +33,7 @@
 	return ..()
 
 /world/BSQL_Debug(msg)
-	world.log << "BSQL_DEBUG: [.....]([args.Join(", ")])"
+	world.log << "BSQL_DEBUG: [msg]"
 
 /proc/Test()
 	world.log << "Beginning test"
