@@ -33,7 +33,7 @@ MySqlQueryOperation::~MySqlQueryOperation() {
 }
 
 void MySqlQueryOperation::StartQuery() {
-	if (connection == nullptr)
+	if (!connection)
 		return;
 
 	mysql_real_query_start(&queryError, connection, queryText.c_str(), queryText.length());
@@ -77,10 +77,9 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 				error = "mysql_use_result() returns error: " + std::string(mysql_error(connection));
 			return true;
 		}
-		if (mysql_fetch_row_start(&row, result) != 0)
+		waitNext = mysql_fetch_row_start(&row, result) != 0;
+		if (waitNext)
 			return false;
-		else
-			waitNext = false;
 	}
 	
 	if(waitNext){
