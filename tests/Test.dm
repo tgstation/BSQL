@@ -28,6 +28,10 @@
 		sleep(1)
 	world.log << "Op [op.id] (conn: [op.connection.id]) complete"
 
+/datum/BSQL_Operation/Del()
+	world.log << "Operation [id] (conn: [connection.id]) deleted"
+	return ..()
+
 /proc/Test()
 	world.log << "Beginning test"
 
