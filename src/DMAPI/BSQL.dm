@@ -1,4 +1,4 @@
-//BSQL - DMAPI v1.0.3.0
+//BSQL - DMAPI v1.1.0.0
 
 //types of connections
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
@@ -6,6 +6,10 @@
 
 //Call this before rebooting or shutting down your world to clean up gracefully. This invalidates all active connection and operation datums
 /world/proc/BSQL_Shutdown()
+	return
+
+//Called whenever a library call is made with verbose information, override and do with as you please
+/world/proc/BSQL_Debug(msg)
 	return
 
 /*
