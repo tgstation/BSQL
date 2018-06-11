@@ -48,12 +48,11 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 	if (!connection) {
 		std::string fail;
 		connection = connPool.RequestConnection(fail);
-		if(!fail.empty())
-			if (++connectFailCount == 3) {
-				complete = true;
-				error = "Failed to establish connection from connection pool: " + fail;
-				return false;
-			}
+		if (!fail.empty() && ++connectFailCount == 3) {
+			complete = true;
+			error = "Failed to establish connection from connection pool: " + fail;
+			return false;
+		}
 		StartQuery();
 		return false;
 	}

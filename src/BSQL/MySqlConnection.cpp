@@ -2,8 +2,7 @@
 
 MySqlConnection::MySqlConnection() : 
 	Connection(Type::MySql),
-	firstSuccessfulConnection(nullptr),
-	newestConnectionAttempt(nullptr)
+	firstSuccessfulConnection(nullptr)
 {}
 
 MySqlConnection::~MySqlConnection() {
@@ -32,28 +31,32 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 	this->password = password;
 	this->database = database;
 
-	std::string fail;
-	LoadNewConnection(fail);
-
+	LoadNewConnection(newestConnectionAttemptKey);
+	newestConnectionAttemptKey = std::string();
 	return operations.begin()->first;
 }
 
 bool MySqlConnection::LoadNewConnection(std::string& fail) {
-	if (newestConnectionAttempt) {
+	if (!newestConnectionAttemptKey.empty()) {
 		//this will chain into calling ReleaseConnection and clear the var
-		auto nca(newestConnectionAttempt);
-		if (nca->IsComplete(false)) {
-			if (availableConnections.size() > 0)
+		auto nca(newestConnectionAttemptKey);
+		auto& op(*GetOperation(nca));
+		if (op.IsComplete(false)) {
+			const auto success(availableConnections.size() > 0);
+			if (success) {
+				ReleaseOperation(nca);
 				return true;
-			fail = nca->GetError();
+			}
+			else {
+				fail = op.GetError();
+				ReleaseOperation(nca);
+			}
 		}
 		else
 			return false;
 	}
 
-	auto newCon(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password, database));
-	newestConnectionAttempt = newCon.get();
-	AddOp(std::move(newCon));
+	newestConnectionAttemptKey = AddOp(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password, database));
 
 	return false;
 }
@@ -73,22 +76,16 @@ MYSQL* MySqlConnection::RequestConnection(std::string& fail) {
 
 void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 	availableConnections.emplace(connection);
+
 	if (!firstSuccessfulConnection)
 		firstSuccessfulConnection = connection;
-	if (newestConnectionAttempt) {
-		auto tmp(newestConnectionAttempt);
-		newestConnectionAttempt = nullptr;
-		if (!tmp->IsComplete(false))
-			newestConnectionAttempt = tmp;
-	}
-}
 
-bool MySqlConnection::ReleaseOperation(const std::string& identifier) {
-	auto op(GetOperation(identifier));
-	if (op && op == newestConnectionAttempt)
-		newestConnectionAttempt = nullptr;
-	auto result(Connection::ReleaseOperation(identifier));
-	return result;
+	if (!newestConnectionAttemptKey.empty()) {
+		std::string tmp;
+		std::swap(tmp, newestConnectionAttemptKey);
+		if (!GetOperation(tmp)->IsComplete(false))
+			std::swap(tmp, newestConnectionAttemptKey);
+	}
 }
 
 void MySqlConnection::KillConnection(MYSQL* connection) {

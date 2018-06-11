@@ -12,7 +12,14 @@
 	world.log << "TestStart"
 	sleep(10)
 	world.log << "Init time elapsed"
-	Test()
+	//run the test 10 times for those awkward race conditions
+	var/fail = FALSE
+	for(var/I in 1 to 10)
+		if(!Test())
+			fail = TRUE
+			break
+	if(!fail)
+		text2file("Success!", "clean_run.lk")
 	del(world)
 
 /proc/WaitOp(datum/BSQL_Operation/op)
@@ -142,4 +149,4 @@
 
 	world.BSQL_Shutdown()
 
-	text2file("Success!", "clean_run.lk")
+	return TRUE

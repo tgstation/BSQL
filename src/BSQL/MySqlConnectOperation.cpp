@@ -25,15 +25,15 @@ bool MySqlConnectOperation::IsComplete(bool noOps) {
 		return true;
 	const auto status(mysql_real_connect_cont(&ret, mysql, 0));
 	complete = status == 0;
-	if (complete) {
-		if (!ret) {
-			error = "mysql_real_connect() returns error: " + std::string(mysql_error(mysql));
-			mysql_close(mysql);	//don't use connPool Kill since it's never seen this connection
-		}
-		else
-			connPool.ReleaseConnection(mysql);
+	if (!complete)
+		return false;
+
+	if (!ret) {
+		error = "mysql_real_connect() returns error: " + std::string(mysql_error(mysql));
+		mysql_close(mysql);	//don't use connPool Kill since it's never seen this connection
 	}
 	else
-		return false;
+		connPool.ReleaseConnection(mysql);
+
 	return true;
 }
