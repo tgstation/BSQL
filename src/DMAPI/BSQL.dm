@@ -8,7 +8,10 @@
 /world/proc/BSQL_Shutdown()
 	return
 
-//Called whenever a library call is made with verbose information, override and do with as you please
+/*
+Called whenever a library call is made with verbose information, override and do with as you please
+  message: English debug message
+*/
 /world/proc/BSQL_Debug(msg)
 	return
 
