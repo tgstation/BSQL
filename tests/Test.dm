@@ -32,6 +32,9 @@
 	world.log << "Operation [id] (conn: [connection.id]) deleted"
 	return ..()
 
+/world/_BSQL_Internal_Call(func, ...)
+	world.log << "[.....]([args.Join(", ")])"
+
 /proc/Test()
 	world.log << "Beginning test"
 
