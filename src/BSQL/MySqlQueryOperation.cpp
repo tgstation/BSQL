@@ -36,7 +36,10 @@ void MySqlQueryOperation::StartQuery() {
 	if (!connection)
 		return;
 
-	mysql_real_query_start(&queryError, connection, queryText.c_str(), queryText.length());
+	status = mysql_real_query_start(&queryError, connection, queryText.c_str(), queryText.length());
+	waitNext = status != 0;
+	if(waitNext)
+		timeoutAt = MySqlOperation::GetTimeout(connection);
 }
 
 bool MySqlQueryOperation::IsComplete(bool noOps) {
@@ -52,13 +55,17 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 			return false;
 		}
 		StartQuery();
-		return false;
+		if(waitNext)
+			return false;
 	}
 
 	if (!queryFinished) {
-		const auto status(mysql_real_query_cont(&queryError, connection, 0));
-		if (status != 0)
-			return false;
+		if (waitNext) {
+			status = MySqlOperation::Poll(connection, timeoutAt, status);
+			status = mysql_real_query_cont(&queryError, connection, status);
+			if (status != 0)
+				return false;
+		}
 
 		if (queryError) {
 			complete = true;
@@ -77,13 +84,17 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 				error = "mysql_use_result() returns error: " + std::string(mysql_error(connection));
 			return true;
 		}
-		waitNext = mysql_fetch_row_start(&row, result) != 0;
-		if (waitNext)
+		status = mysql_fetch_row_start(&row, result);
+		waitNext = status != 0;
+		if (waitNext) {
+			timeoutAt = MySqlOperation::GetTimeout(connection);
 			return false;
+		}
 	}
 	
 	if (waitNext) {
-		const auto status(mysql_fetch_row_cont(&row, result, 0));
+		status = MySqlOperation::Poll(connection, timeoutAt, status);
+		status = mysql_fetch_row_cont(&row, result, status);
 
 		if (status != 0)
 			return false;
@@ -115,8 +126,12 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 
 		currentRow = std::move(json);
 
-		if(!noOps)
-			waitNext = mysql_fetch_row_start(&row, result) != 0;
+		if (!noOps) {
+			status = mysql_fetch_row_start(&row, result);
+			waitNext = status != 0;
+			if(waitNext)
+				timeoutAt = MySqlOperation::GetTimeout(connection);
+		}
 	}
 	else {
 		//resultless?

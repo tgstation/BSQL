@@ -7,8 +7,8 @@ private:
 	MYSQL* connection;
 	MYSQL_RES* result;
 	MYSQL_ROW row;
-	int queryError;
-	int connectFailCount;
+	std::chrono::milliseconds timeoutAt;
+	int queryError, connectFailCount, status;
 	bool complete, queryFinished, waitNext;
 private:
 	void StartQuery();
