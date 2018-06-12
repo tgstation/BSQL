@@ -82,7 +82,7 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 			return false;
 	}
 	
-	if(waitNext){
+	if (waitNext) {
 		const auto status(mysql_fetch_row_cont(&row, result, 0));
 
 		if (status != 0)
@@ -90,11 +90,6 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 	}
 
 	if (row != nullptr) {
-		struct ColInfo {
-			std::string name;
-			enum_field_types type;
-		};
-
 		std::string json("{");
 		bool first(true);
 		const auto numFields(mysql_num_fields(result));
