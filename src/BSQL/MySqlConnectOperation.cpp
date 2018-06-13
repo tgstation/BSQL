@@ -51,8 +51,6 @@ bool MySqlConnectOperation::IsComplete(bool noSkip) {
 }
 
 std::thread* MySqlConnectOperation::GetActiveThread() {
-	if (++callsToGetActiveThread > 1)
-		int i = 0;
 	state->lock.lock();
 
 	if (IsComplete(false)) {

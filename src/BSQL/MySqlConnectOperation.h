@@ -8,8 +8,6 @@ private:
 	bool complete;
 	std::shared_ptr<ClassState> state;
 	std::thread connectThread;
-
-	int callsToGetActiveThread = 0;
 private:
 	static MYSQL* InitMySql();
 	void DoConnect(const std::string address, const unsigned short port, const std::string username, const std::string password, const std::string database, MYSQL* localMySql, std::shared_ptr<ClassState> localState);
