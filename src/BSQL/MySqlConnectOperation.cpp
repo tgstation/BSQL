@@ -26,8 +26,8 @@ bool MySqlConnectOperation::IsComplete(bool noOps) {
 		return true;
 
 	if (!complete) {
-		status = MySqlOperation::Poll(mysql, timeoutAt, status);
-		status = mysql_real_connect_cont(&ret, mysql, status);
+		if(MySqlOperation::Poll(mysql, timeoutAt, status))
+			status = mysql_real_connect_cont(&ret, mysql, status);
 		complete = status == 0;
 		if (!complete)
 			return false;

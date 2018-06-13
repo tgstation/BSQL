@@ -61,8 +61,8 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 
 	if (!queryFinished) {
 		if (waitNext) {
-			status = MySqlOperation::Poll(connection, timeoutAt, status);
-			status = mysql_real_query_cont(&queryError, connection, status);
+			if(MySqlOperation::Poll(connection, timeoutAt, status))
+				status = mysql_real_query_cont(&queryError, connection, status);
 			if (status != 0)
 				return false;
 		}
@@ -93,8 +93,8 @@ bool MySqlQueryOperation::IsComplete(bool noOps) {
 	}
 	
 	if (waitNext) {
-		status = MySqlOperation::Poll(connection, timeoutAt, status);
-		status = mysql_fetch_row_cont(&row, result, status);
+		if(MySqlOperation::Poll(connection, timeoutAt, status))
+			status = mysql_fetch_row_cont(&row, result, status);
 
 		if (status != 0)
 			return false;
