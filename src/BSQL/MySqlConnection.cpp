@@ -1,12 +1,17 @@
 #include "BSQL.h"
 
-MySqlConnection::MySqlConnection() : 
-	Connection(Type::MySql),
+MySqlConnection::MySqlConnection(Library& library) :
+	Connection(Type::MySql, library),
 	firstSuccessfulConnection(nullptr)
 {}
 
 MySqlConnection::~MySqlConnection() {
 	//do this first so all reserved connections are returned to the queue
+	for (auto& I : operations) {
+		auto thread(I.second->GetActiveThread());
+		if (thread)
+			library.RegisterZombieThread(std::move(*thread));
+	}
 	operations.clear();
 	//and release them
 	while (!availableConnections.empty()) {
@@ -30,13 +35,13 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 	this->username = username;
 	this->password = password;
 	this->database = database;
-
-	LoadNewConnection(newestConnectionAttemptKey);
+	int tmp;
+	LoadNewConnection(newestConnectionAttemptKey, tmp);
 	newestConnectionAttemptKey = std::string();
 	return operations.begin()->first;
 }
 
-bool MySqlConnection::LoadNewConnection(std::string& fail) {
+bool MySqlConnection::LoadNewConnection(std::string& fail, int& failno) {
 	if (!newestConnectionAttemptKey.empty()) {
 		//this will chain into calling ReleaseConnection and clear the var
 		auto nca(newestConnectionAttemptKey);
@@ -49,6 +54,7 @@ bool MySqlConnection::LoadNewConnection(std::string& fail) {
 			}
 			else {
 				fail = op.GetError();
+				failno = op.GetErrno();
 				ReleaseOperation(nca);
 			}
 		}
@@ -65,12 +71,13 @@ std::string MySqlConnection::CreateQuery(const std::string& queryText) {
 	return AddOp(std::make_unique<MySqlQueryOperation>(*this, std::string(queryText)));
 }
 
-MYSQL* MySqlConnection::RequestConnection(std::string& fail) {
-	if (availableConnections.empty() && !LoadNewConnection(fail))
+MYSQL* MySqlConnection::RequestConnection(std::string& fail, int& failno, bool& doNotClose) {
+	if (availableConnections.empty() && !LoadNewConnection(fail, failno))
 		return nullptr;
 
 	auto front(availableConnections.top());
 	availableConnections.pop();
+	doNotClose = front == firstSuccessfulConnection;
 	return front;
 }
 
@@ -86,11 +93,6 @@ void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 		if (!GetOperation(tmp)->IsComplete(false))
 			std::swap(tmp, newestConnectionAttemptKey);
 	}
-}
-
-void MySqlConnection::KillConnection(MYSQL* connection) {
-	if (connection != firstSuccessfulConnection)	//we keep the first around for quoting
-		mysql_close(connection);
 }
 
 std::string MySqlConnection::Quote(const std::string& str) {

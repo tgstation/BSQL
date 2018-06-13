@@ -9,7 +9,6 @@ Connection.cpp
 MySqlConnection.cpp
 Operation.cpp
 MySqlConnectOperation.cpp
-MySqlOperation.cpp
 MySqlQueryOperation.cpp
 Query.cpp
 )

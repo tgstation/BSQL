@@ -1,9 +1,7 @@
 ﻿#include "BSQL.h"
 
-namespace {
-	std::unique_ptr<Library> library;
-	std::string lastCreatedConnection, lastCreatedOperation, lastCreatedOperationConnectionId, lastRow, returnValueHolder;
-}
+std::unique_ptr<Library> library;
+std::string lastCreatedConnection, lastCreatedOperation, lastCreatedOperationConnectionId, lastRow, returnValueHolder;
 
 const char* TryLoadQuery(const int argumentCount, const char* const* const args, Query** query) noexcept {
 	if (argumentCount != 2)
@@ -256,7 +254,7 @@ extern "C" {
 			auto operation(connection->GetOperation(operationIdentifier));
 			if (!operation)
 				return nullptr;
-			return operation->IsComplete(true) ? "DONE" : "NOTDONE";
+			return operation->IsComplete(false) ? "DONE" : "NOTDONE";
 		}
 		catch (std::bad_alloc&) {
 			return "Out of memory!";

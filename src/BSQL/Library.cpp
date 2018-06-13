@@ -2,7 +2,14 @@
 
 Library::Library() noexcept :
 	identifierCounter(0)
-{}
+{
+	mysql_library_init(0, nullptr, nullptr);
+}
+
+Library::~Library() noexcept {
+	for (auto& I : zombieThreads)
+		I.join();
+}
 
 Connection* Library::GetConnection(const std::string& identifier) noexcept {
 	auto iter(connections.find(identifier));
@@ -23,7 +30,7 @@ std::string Library::CreateConnection(Connection::Type type) noexcept {
 			switch (type)
 			{
 			case Connection::Type::MySql:
-				connections.emplace(identifier, std::make_unique<MySqlConnection>());
+				connections.emplace(identifier, std::make_unique<MySqlConnection>(*this));
 				break;
 			case Connection::Type::SqlServer:
 				--identifierCounter;
@@ -35,4 +42,14 @@ std::string Library::CreateConnection(Connection::Type type) noexcept {
 		}
 	}
 	return std::string();
+}
+
+void Library::RegisterZombieThread(std::thread&& thread) noexcept {
+	try {
+		zombieThreads.emplace_back(std::move(thread));
+	}
+	catch(std::bad_alloc&) {
+		//gotta wait then
+		thread.join();
+	}
 }

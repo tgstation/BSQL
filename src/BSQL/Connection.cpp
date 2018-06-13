@@ -1,6 +1,7 @@
 #include "BSQL.h"
 
-Connection::Connection(Type type) :
+Connection::Connection(Type type, Library& library) :
+	library(library),
 	type(type),
 	identifierCounter(0)
 {}
@@ -12,6 +13,12 @@ std::string Connection::AddOp(std::unique_ptr<Operation>&& operation) {
 }
 
 bool Connection::ReleaseOperation(const std::string& identifier) {
+	auto op(GetOperation(identifier));
+	if (!op)
+		return false;
+	auto thread(op->GetActiveThread());
+	if (thread)
+		library.RegisterZombieThread(std::move(*thread));
 	return operations.erase(identifier) > 0;
 }
 
