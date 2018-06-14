@@ -1,132 +1,159 @@
 #include "BSQL.h"
 
 MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&& queryText) :
-	queryText(queryText),
+	queryText(std::move(queryText)),
 	connPool(connPool),
-	connection(connPool.RequestConnection()),
-	result(nullptr),
+	connection(nullptr),
+	state(std::make_shared<ClassState>()),
+	connectionAttempts(0),
+	started(false),
 	complete(false),
-	queryFinished(false)
+	operationThread(TryStart())
 {
-	StartQuery();
 }
 
 MySqlQueryOperation::~MySqlQueryOperation() {
-	if (connection) {
-		//must ensure everything is taken care of
-
-		try {
-			while (!complete) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				IsComplete(false);
-			}
-		}
-		//can't save it
-		catch (std::bad_alloc&) {
-			connPool.KillConnection(connection);
-			connection = nullptr;
-		}
-		if (result)
-			mysql_free_result(result);
-		if (connection)
-			connPool.ReleaseConnection(connection);
-	}
-}
-
-void MySqlQueryOperation::StartQuery() {
-	if (connection == nullptr)
+	if (!connection)
 		return;
-
-	mysql_real_query_start(&queryError, connection, queryText.c_str(), queryText.length());
+	connPool.ReleaseConnection(connection);
 }
 
-bool MySqlQueryOperation::IsComplete(bool noOps) {
-	if (complete)
-		return true;
-
+std::thread MySqlQueryOperation::TryStart() {
+	connection = connPool.RequestConnection(error, errnum, noClose);
 	if (!connection) {
-		connection = connPool.RequestConnection();
-		StartQuery();
+		if (!error.empty())
+			complete = ++connectionAttempts == 3;
+		return std::thread();
+	}
+	started = true;
+	return std::thread(&MySqlQueryOperation::StartQuery, this, connection, std::move(queryText), state);
+}
+
+void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassState>& localClassState) {
+	//resultless?
+	localClassState->lock.lock();
+	if (localClassState->alive) {
+		complete = true;
+		const auto tmpErr(mysql_errno(mysql));
+		if (tmpErr) {
+			//no it's an error
+			error = mysql_error(mysql);
+			errnum = tmpErr;
+		}
+	}
+	else if (!noClose)
+		mysql_close(mysql);
+	mysql_thread_end();
+	localClassState->lock.unlock();
+}
+
+void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText, std::shared_ptr<ClassState> localClassState) {
+	mysql_thread_init();
+
+	const auto localError(mysql_real_query(mysql, localQueryText.c_str(), localQueryText.length()));
+
+	if (localError) {
+		QuestionableExit(mysql, localClassState);
+		return;
+	}
+
+	const auto result(mysql_use_result(mysql));
+	if (!result) {
+		QuestionableExit(mysql, localClassState);
+		return;
+	}
+
+	for (MYSQL_ROW row(mysql_fetch_row(result)); row != nullptr; row = mysql_fetch_row(result)) {
+		try {
+			std::string json("{");
+			bool first(true);
+			const auto numFields(mysql_num_fields(result));
+			mysql_field_seek(result, 0);
+			for (auto I(0U); I < numFields; ++I) {
+				const auto field(mysql_fetch_field(result));
+				if (first)
+					first = false;
+				else
+					json.append(",");
+				json.append("\"");
+				json.append(field->name);
+				json.append("\":");
+				if (row[I] == nullptr)
+					json.append("null");
+				else {
+					json.append("\"");
+					json.append(row[I]);
+					json.append("\"");
+				}
+			}
+			json.append("}");
+
+			localClassState->lock.lock();
+			const auto alive(localClassState->alive);
+			if (alive)
+				results.emplace(std::move(json));
+			localClassState->lock.unlock();
+			if (!alive)
+				break;
+		}
+		catch (std::bad_alloc&) {
+			mysql_free_result(result);
+			localClassState->lock.lock();
+			if (localClassState->alive) {
+				complete = true;
+				errnum = -1;
+				error = "Out of memory!";
+			}
+			else if (!noClose)
+				mysql_close(mysql);
+			mysql_thread_end();
+			localClassState->lock.unlock();
+			return;
+		}
+	}
+
+	mysql_free_result(result);
+
+	QuestionableExit(mysql, localClassState);
+}
+
+bool MySqlQueryOperation::IsComplete(bool noSkip) {
+	if (!started) {
+		operationThread = TryStart();
 		return false;
 	}
 
-	if (!queryFinished) {
-		const auto status(mysql_real_query_cont(&queryError, connection, 0));
-		if (status != 0)
-			return false;
-
-		if (queryError) {
-			complete = true;
-			error = "mysql_real_query() returns error: " + std::string(mysql_error(connection));
-			return true;
+	state->lock.lock();
+	if (!results.empty()) {
+		if (!noSkip) {
+			currentRow = std::move(results.front());
+			results.pop();
 		}
-
-		queryFinished = true;
-
-		result = mysql_use_result(connection);
-		if (!result) {
-			//resultless?
-			complete = true;
-			if(mysql_errno(connection))
-				//no it's an error
-				error = "mysql_use_result() returns error: " + std::string(mysql_error(connection));
-			return true;
-		}
-		if (mysql_fetch_row_start(&row, result) != 0)
-			return false;
-		else
-			waitNext = false;
-	}
-	
-	if(waitNext){
-		const auto status(mysql_fetch_row_cont(&row, result, 0));
-
-		if (status != 0)
-			return false;
+		state->lock.unlock();
+		return true;
 	}
 
-	if (row != nullptr) {
-		struct ColInfo {
-			std::string name;
-			enum_field_types type;
-		};
+	const auto result(complete);
+	state->lock.unlock();
+	if (result && !noSkip)
+		currentRow = std::string();
+	return result;
+}
 
-		std::string json("{");
-		bool first(true);
-		const auto numFields(mysql_num_fields(result));
-		mysql_field_seek(result, 0);
-		for (auto I(0U); I < numFields; ++I) {
-			const auto field(mysql_fetch_field(result));
-			if (first)
-				first = false;
-			else
-				json.append(",");
-			json.append("\"");
-			json.append(field->name);
-			json.append("\":");
-			if (row[I] == nullptr)
-				json.append("null");
-			else {
-				json.append("\"");
-				json.append(row[I]);
-				json.append("\"");
-			}
-		}
-		json.append("}");
+std::thread* MySqlQueryOperation::GetActiveThread() {
+	if (!started)
+		return nullptr;
 
-		currentRow = std::move(json);
+	state->lock.lock();
 
-		if(!noOps)
-			waitNext = mysql_fetch_row_start(&row, result) != 0;
+	if (complete) {
+		state->lock.unlock();
+		operationThread.join();
+		return nullptr;
 	}
-	else {
-		//resultless?
-		complete = true;
-		if (mysql_errno(connection))
-			//no it's an error
-			error = "mysql_fetch_row() returns error: " + std::string(mysql_error(connection));
-		else
-			currentRow = std::string();
-	}
-	return true;
+
+	state->alive = false;
+	state->lock.unlock();
+	connection = nullptr;
+	return &operationThread;
 }

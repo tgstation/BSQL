@@ -2,18 +2,24 @@
 
 class MySqlQueryOperation : public Query {
 private:
-	const std::string queryText;
+	std::string queryText;
 	MySqlConnection& connPool;
 	MYSQL* connection;
-	MYSQL_RES* result;
-	MYSQL_ROW row;
-	int queryError;
-	bool complete, queryFinished, waitNext;
+	bool noClose;
+	std::shared_ptr<ClassState> state;
+	std::queue<std::string> results;
+	int connectionAttempts;
+	bool started, complete;
+	std::thread operationThread;
 private:
-	void StartQuery();
+	std::thread TryStart();
+
+	void QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassState>& localClassState);
+	void StartQuery(MYSQL* mysql, std::string&& localQueryText, std::shared_ptr<ClassState> localClassState);
 public:
 	MySqlQueryOperation(MySqlConnection& connPool, std::string&& queryText);
 	~MySqlQueryOperation() override;
 
-	bool IsComplete(bool noOps) override;
+	bool IsComplete(bool noSkip) override;
+	std::thread* GetActiveThread() override;
 };

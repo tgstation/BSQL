@@ -5,3 +5,9 @@ std::string Operation::GetError() {
 		return std::string();
 	return error;
 }
+
+int Operation::GetErrno() {
+	if (!IsComplete(true))
+		return -1;
+	return errnum;
+}

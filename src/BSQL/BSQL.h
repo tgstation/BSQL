@@ -6,14 +6,18 @@
 
 #include <mysql/mysql.h>
 
-#include <atomic>
 #include <chrono>
 #include <deque>
+#include <limits>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <stack>
 #include <string>
 #include <thread>
+
+class Library;
 
 #include "Operation.h"
 #include "Query.h"

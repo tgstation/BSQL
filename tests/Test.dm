@@ -12,7 +12,14 @@
 	world.log << "TestStart"
 	sleep(10)
 	world.log << "Init time elapsed"
-	Test()
+	//run the test 10 times for those awkward race conditions
+	var/fail = FALSE
+	for(var/I in 1 to 10)
+		if(!Test())
+			fail = TRUE
+			break
+	if(!fail)
+		text2file("Success!", "clean_run.lk")
 	del(world)
 
 /proc/WaitOp(datum/BSQL_Operation/op)
@@ -20,6 +27,13 @@
 	while(!op.IsComplete())
 		sleep(1)
 	world.log << "Op [op.id] (conn: [op.connection.id]) complete"
+
+/datum/BSQL_Operation/Del()
+	world.log << "Operation [id] (conn: [connection ? connection.id : "null"]) deleted"
+	return ..()
+
+/world/BSQL_Debug(msg)
+	world.log << "BSQL_DEBUG: [msg]"
 
 /proc/Test()
 	world.log << "Beginning test"
@@ -59,7 +73,9 @@
 
 	q = conn.BeginQuery("CREATE DATABASE [quoted_db]");
 	world.log << "Create db op id: [q.id]"
-	WaitOp(q)
+	q.WaitForCompletion()
+	if(!q.IsComplete())
+		CRASH("Wait for completion didn't work!")
 	error = q.GetError()
 	if(error)
 		CRASH(error)
@@ -140,4 +156,4 @@
 
 	world.BSQL_Shutdown()
 
-	text2file("Success!", "clean_run.lk")
+	return TRUE

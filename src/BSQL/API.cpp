@@ -1,9 +1,7 @@
 ﻿#include "BSQL.h"
 
-namespace {
-	std::unique_ptr<Library> library;
-	std::string lastCreatedConnection, lastCreatedOperation, lastCreatedOperationConnectionId, lastRow, returnValueHolder;
-}
+std::unique_ptr<Library> library;
+std::string lastCreatedConnection, lastCreatedOperation, lastCreatedOperationConnectionId, lastRow, returnValueHolder;
 
 const char* TryLoadQuery(const int argumentCount, const char* const* const args, Query** query) noexcept {
 	if (argumentCount != 2)
@@ -256,7 +254,7 @@ extern "C" {
 			auto operation(connection->GetOperation(operationIdentifier));
 			if (!operation)
 				return nullptr;
-			return operation->IsComplete(true) ? "DONE" : "NOTDONE";
+			return operation->IsComplete(false) ? "DONE" : "NOTDONE";
 		}
 		catch (std::bad_alloc&) {
 			return "Out of memory!";
@@ -310,6 +308,32 @@ extern "C" {
 		}
 		catch (std::runtime_error&) {
 			return nullptr;
+		}
+	}
+
+	BYOND_FUNC BlockOnOperation(const int argumentCount, const char* const* const args) noexcept {
+		if (argumentCount != 2)
+			return "Invalid arguments!";
+		const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+		if (!connectionIdentifier)
+			return "Invalid connection identifier!";
+		if (!operationIdentifier)
+			return "Invalid operation identifier!";
+		if (!library)
+			return "Library not initialized!";
+		try {
+			auto connection(library->GetConnection(connectionIdentifier));
+			if (!connection)
+				return "Connection identifier does not exist!";
+			auto op(connection->GetOperation(operationIdentifier));
+			if (!op)
+				return "Operation identifier does not exist!";
+			while (!op->IsComplete(false))
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			return nullptr;
+		}
+		catch (std::bad_alloc&) {
+			return "Out of memory!";
 		}
 	}
 }

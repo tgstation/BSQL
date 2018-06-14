@@ -9,11 +9,12 @@ public:
 public:
 	const Type type;
 protected:
+	Library & library;
 	std::map<std::string, std::unique_ptr<Operation>> operations;
 private:
 	unsigned long long identifierCounter;
 protected:
-	Connection(Type type);
+	Connection(Type type, Library& library);
 
 	std::string AddOp(std::unique_ptr<Operation>&& operation);
 public:
