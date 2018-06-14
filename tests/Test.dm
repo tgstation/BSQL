@@ -29,7 +29,7 @@
 	world.log << "Op [op.id] (conn: [op.connection.id]) complete"
 
 /datum/BSQL_Operation/Del()
-	world.log << "Operation [id] (conn: [connection.id]) deleted"
+	world.log << "Operation [id] (conn: [connection ? connection.id : "null"]) deleted"
 	return ..()
 
 /world/BSQL_Debug(msg)

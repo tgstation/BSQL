@@ -9,6 +9,8 @@ Library::Library() noexcept :
 Library::~Library() noexcept {
 	for (auto& I : zombieThreads)
 		I.join();
+	//https://jira.mariadb.org/browse/CONC-336
+	//mysql_library_end();
 }
 
 Connection* Library::GetConnection(const std::string& identifier) noexcept {
