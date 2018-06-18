@@ -17,7 +17,7 @@ fi
 
 if [ -f "$HOME/MariaDB/libmariadb.so" ];
 then
-  echo "Using cached MariaDB directory."
+  echo "Using cached MariaDB library."
 else
   echo "Setting up MariaDB."
   rm -rf "$HOME/MariaDB"
