@@ -14,6 +14,7 @@ public:
 	virtual ~Operation() = default;
 
 	std::string GetError();
+	std::string GetErrorCode();
 	int GetErrno();
 
 	virtual bool IsComplete(bool noSkip) = 0;

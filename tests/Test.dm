@@ -64,7 +64,18 @@
 		CRASH("Failed to quote \"[other_quote_test]\"! Got: \"[quote_test]\"")
 	world.log << "Quoted \"[other_quote_test]\" to \"[quote_test]\""
 
-	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("DROP DATABASE IF EXISTS [quoted_db]");
+	var/datum/BSQL_Operation/Query/q = conn.BeginQuery("This is not a real query")
+	world.log << "Nonsense op id: [q.id]"
+	WaitOp(q)
+	error = q.GetError()
+	if(!error)
+		CRASH("Nonsense query returned no error!")
+	var/errorCode = q.GetErrorCode()
+	if(errorCode == null)
+		CRASH("Nonsense query returned no error code!")
+	world.log << "Nonsense error ([errorCode]): [error]"
+
+	q = conn.BeginQuery("DROP DATABASE IF EXISTS [quoted_db]")
 	world.log << "Drop db op id: [q.id]"
 	WaitOp(q)
 	error = q.GetError()

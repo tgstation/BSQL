@@ -1,4 +1,4 @@
-//BSQL - DMAPI v1.1.0.0
+//BSQL - DMAPI v1.1.1.0
 
 //types of connections
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
@@ -65,13 +65,21 @@ Blocks the entire game until the given operation completes. IsComplete should no
 */
 /datum/BSQL_Operation/proc/WaitForCompletion()
 	return
-
+	
 /*
 Get the error message associated with an operation. Should not be used while IsComplete() returns FALSE
 
  Returns: The error message, if any. null otherwise
 */
 /datum/BSQL_Operation/proc/GetError()
+	return
+
+/*
+Get the error code associated with an operation. Should not be used while IsComplete() returns FALSE
+
+ Returns: The error code, if any. null otherwise
+*/
+/datum/BSQL_Operation/proc/GetErrorCode()
 	return
 
 /*
