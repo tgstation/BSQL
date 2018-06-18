@@ -24,7 +24,7 @@ BSQL_DEL_PROC(/datum/BSQL_Operation)
 		BSQL_ERROR("Error fetching operation [id] for connection [connection.id]!")
 		return
 	return result == "DONE"
-	
+
 /datum/BSQL_Operation/GetError()
 	if(BSQL_IS_DELETED(connection))
 		return "Connection deleted!"
