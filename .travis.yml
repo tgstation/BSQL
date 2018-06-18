@@ -26,6 +26,7 @@ install:
   - eval "${MATRIX_EVAL}"
   - build/install_deps.sh
 script:
-  - mkdir artifacts && cd artifacts && cmake .. -DMARIA_LIBRARY=$HOME/MariaDB/libmariadb.so && make && cd ..
+  - ls $HOME/MariaDB
+  - mkdir artifacts && cd artifacts && cmake .. -DMARIA_LIBRARY=$HOME/MariaDB/libmariadb.so && make VERBOSE=1 && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
   - cd tests && ./test_byond.sh
