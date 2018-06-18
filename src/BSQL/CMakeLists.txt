@@ -24,7 +24,7 @@ set(WSLIB ws2_32)
 else() #system package, this pmuch only works for travis
 set_target_properties(BSQL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql")
-set(MARIA_LIBRARY /home/travis/MariaDB/libmariadb.so)
+find_library(MARIA_LIBRARY NAMES mariadb PATHS /home/travis/MariaDB NO_DEFAULT_PATH)
 endif()
 
 include_directories(${MARIA_INCLUDE_DIR})
