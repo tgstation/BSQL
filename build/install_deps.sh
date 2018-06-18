@@ -15,11 +15,12 @@ else
   cd ~/
 fi
 
-if [ -d "$HOME/MariaDB" ];
+if [ ! -f "$HOME/MariaDB/libmariadb.so" ];
 then
   echo "Using cached MariaDB directory."
 else
   echo "Setting up MariaDB."
+  rm -rf "$HOME/MariaDB"
   mkdir -p "$HOME/MariaDB"
   curl "http://mirrors.kernel.org/ubuntu/pool/universe/m/mariadb-connector-c/libmariadb-dev_2.3.3-1_i386.deb" -o mariadb.deb
   dpkg -x mariadb.deb extract
