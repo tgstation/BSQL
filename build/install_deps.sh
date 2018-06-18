@@ -15,7 +15,7 @@ else
   cd ~/
 fi
 
-if [ ! -f "$HOME/MariaDB/libmariadb.so" ];
+if [ -f "$HOME/MariaDB/libmariadb.so" ];
 then
   echo "Using cached MariaDB directory."
   exit 0
