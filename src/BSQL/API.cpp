@@ -67,7 +67,7 @@ extern "C" {
 				return "Operation identifier does not exist!";
 			if (!operation->IsComplete(true))
 				return "Operation is not complete!";
-			returnValueHolder = code ? operation->GetError() : operation->GetErrorCode();
+			returnValueHolder = code ? operation->GetErrorCode() : operation->GetError();
 			return returnValueHolder.c_str();
 		}
 		catch (std::bad_alloc&) {
