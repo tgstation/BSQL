@@ -9,8 +9,8 @@ env:
 cache:
   directories:
     - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
+    - $HOME/MariaDB
 addons:
-  mariadb: '10.2'
   apt:
     sources:
       - ubuntu-toolchain-r-test
@@ -19,11 +19,12 @@ addons:
       - g++-7-multilib
       - libc6-i386
       - libstdc++6:i386
+services:
+  - mysql
 install:
   - eval "${MATRIX_EVAL}"
-  - build/install_byond.sh
+  - build/install_deps.sh
 script:
-  - ls /usr/lib/i386-linux-gnu
-  - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
+  - mkdir artifacts && cd artifacts && cmake .. -DMARIA_LIBRARY=$HOME/MariaDB/libmariadb.so && make && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
   - cd tests && ./test_byond.sh
