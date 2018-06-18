@@ -51,10 +51,7 @@ extern "C" {
 		return nullptr;
 	}
 
-	BYOND_FUNC GetError(const int argumentCount, const char* const* const args) noexcept {
-		if (argumentCount != 2)
-			return "Invalid arguments!";
-		const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+	const char* GetErrorImpl(const char* const& connectionIdentifier, const char* const& operationIdentifier, bool code) {
 		if (!library)
 			return "Library not initialized!";
 		if (!connectionIdentifier)
@@ -70,12 +67,26 @@ extern "C" {
 				return "Operation identifier does not exist!";
 			if (!operation->IsComplete(true))
 				return "Operation is not complete!";
-			returnValueHolder = operation->GetError();
+			returnValueHolder = code ? operation->GetErrorCode() : operation->GetError();
 			return returnValueHolder.c_str();
 		}
 		catch (std::bad_alloc&) {
 			return "Out of memory!";
 		}
+	}
+
+	BYOND_FUNC GetError(const int argumentCount, const char* const* const args) noexcept {
+		if (argumentCount != 2)
+			return "Invalid arguments!";
+		const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+		return GetErrorImpl(connectionIdentifier, operationIdentifier, false);
+	}
+
+	BYOND_FUNC GetErrorCode(const int argumentCount, const char* const* const args) noexcept {
+		if (argumentCount != 2)
+			return "Invalid arguments!";
+		const auto& connectionIdentifier(args[0]), operationIdentifier(args[1]);
+		return GetErrorImpl(connectionIdentifier, operationIdentifier, true);
 	}
 
 	BYOND_FUNC CreateConnection(const int argumentCount, const char* const* const args) noexcept {
