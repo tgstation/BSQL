@@ -19,8 +19,6 @@ addons:
       - g++-7-multilib
       - libc6-i386
       - libstdc++6:i386
-services:
-  - mysql
 install:
   - eval "${MATRIX_EVAL}"
   - build/install_byond.sh
