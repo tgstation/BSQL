@@ -18,19 +18,14 @@ fi
 if [ -f "$HOME/MariaDB/libmariadb.so" ];
 then
   echo "Using cached MariaDB directory."
-  exit 0
 else
   echo "Setting up MariaDB."
   rm -rf "$HOME/MariaDB"
   mkdir -p "$HOME/MariaDB"
-  curl "http://mirrors.kernel.org/ubuntu/pool/universe/m/mariadb-connector-c/libmariadb-dev_2.3.3-1_i386.deb" -o mariadb.deb
+  wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mariadb-connector-c/libmariadb-dev_2.3.3-1_i386.deb
   ls
-  dpkg -x mariadb.deb /tmp/extract
-  rm mariadb.deb
+  dpkg -x libmariadb-dev_2.3.3-1_i386.deb /tmp/extract
+  rm libmariadb-dev_2.3.3-1_i386.deb
   mv /tmp/extract/usr/lib/i386-linux-gnu/libmariadb.so $HOME/MariaDB/
   rm -rf /tmp/extract
-  exit 0
 fi
-
-#some variable not set correctly, panic
-exit 1
