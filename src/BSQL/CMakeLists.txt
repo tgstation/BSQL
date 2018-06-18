@@ -24,7 +24,7 @@ set(WSLIB ws2_32)
 else() #system package
 set_target_properties(BSQL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql")
-find_library(MARIA_LIBRARY NAMES "mariadbclient" PATHS "/usr/lib/i386-linux-gnu")
+find_library(MARIA_LIBRARY NAMES "mariadb" PATHS "/usr/lib/i386-linux-gnu")
 endif()
 
 include_directories(${MARIA_INCLUDE_DIR})
