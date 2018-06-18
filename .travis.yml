@@ -10,6 +10,7 @@ cache:
   directories:
     - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
 addons:
+  mariadb: '10.2'
   apt:
     sources:
       - ubuntu-toolchain-r-test
@@ -18,7 +19,6 @@ addons:
       - g++-7-multilib
       - libc6-i386
       - libstdc++6:i386
-      - libmariadbclient-dev:i386
 services:
   - mysql
 install:
