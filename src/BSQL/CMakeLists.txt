@@ -24,7 +24,7 @@ add_precompiled_header(BSQL BSQL.h FORCEINCLUDE)
 set(WSLIB ws2_32)
 else() #system package
 set_target_properties(BSQL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
-find_library(MARIA_LIBRARY NAMES "mariadb")
+find_library(MARIA_LIBRARY mariadb)
 endif()
 
 target_link_libraries(BSQL ${MARIA_LIBRARY} ${WSLIB})
