@@ -18,6 +18,7 @@ fi
 if [ ! -f "$HOME/MariaDB/libmariadb.so" ];
 then
   echo "Using cached MariaDB directory."
+  exit 0
 else
   echo "Setting up MariaDB."
   rm -rf "$HOME/MariaDB"
@@ -27,6 +28,7 @@ else
   rm mariadb.deb
   mv extract/usr/lib/i386-linux-gnu/libmariadb.so $HOME/MariaDB/
   rm -rf extract
+  exit 0
 fi
 
 #some variable not set correctly, panic
