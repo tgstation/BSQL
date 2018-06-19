@@ -15,5 +15,17 @@ else
   cd ~/
 fi
 
-wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mariadb-connector-c/libmariadb-dev_2.3.3-1_i386.deb
-sudo dpkg -i libmariadb-dev_2.3.3-1_i386.deb
+if [ -f "$HOME/MariaDB/libmariadb.so" ];
+then
+  echo "Using cached MariaDB library."
+else
+  echo "Setting up MariaDB."
+  rm -rf "$HOME/MariaDB"
+  mkdir -p "$HOME/MariaDB"
+  wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mariadb-connector-c/libmariadb-dev_2.3.3-1_i386.deb
+  dpkg -x libmariadb-dev_2.3.3-1_i386.deb /tmp/extract
+  rm libmariadb-dev_2.3.3-1_i386.deb
+  mv /tmp/extract/usr/lib/i386-linux-gnu/libmariadb.so $HOME/MariaDB/
+  rm -rf /tmp/extract
+fi
+file $HOME/MariaDB

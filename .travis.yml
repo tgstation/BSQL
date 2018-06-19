@@ -1,5 +1,4 @@
 language: cpp
-sude: required
 git:
   depth: 1
 env:
@@ -21,6 +20,7 @@ addons:
       - libc6-i386
       - linux-libc-dev:i386
       - libstdc++6:i386
+      - cmake
 services:
   - mysql
 install:
