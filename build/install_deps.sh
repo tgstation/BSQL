@@ -28,4 +28,4 @@ else
   mv /tmp/extract/usr/lib/i386-linux-gnu/libmariadb.so $HOME/MariaDB/
   rm -rf /tmp/extract
 fi
-ls $HOME/MariaDB
+file $HOME/MariaDB
