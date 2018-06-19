@@ -20,7 +20,8 @@ addons:
       - libc6-i386
       - linux-libc-dev:i386
       - libstdc++6:i386
-      - cmake
+      - zlib1g
+      - libssl1.0.0
 services:
   - mysql
 install:
