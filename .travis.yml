@@ -30,7 +30,7 @@ install:
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
-  - mkdir ~/.byond/bin/
+  - mkdir -p ~/.byond/bin/
   - ln -s $HOME/MariaDB/libmariadb.so ~/.byond/bin/
   - ldd tests/libBSQL.so
   - cd tests && ./test_byond.sh
