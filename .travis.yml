@@ -28,6 +28,6 @@ install:
   - eval "${MATRIX_EVAL}"
   - build/install_deps.sh
 script:
-  - mkdir artifacts && cd artifacts && cmake .. && make VERBOSE=1 && cd ..
+  - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
   - cd tests && ./test_byond.sh
