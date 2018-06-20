@@ -15,7 +15,7 @@ else
   cd ~/
 fi
 
-if [ -f "$HOME/MariaDB/libmariadb.so" ];
+if [ -f "$HOME/MariaDB/libmariadb.so.2" ] && [ -f "$HOME/MariaDB/libmariadb.so" ];
 then
   echo "Using cached MariaDB library."
 else
@@ -25,6 +25,7 @@ else
   wget http://mirrors.kernel.org/ubuntu/pool/universe/m/mariadb-client-lgpl/libmariadb2_2.0.0-1_i386.deb
   dpkg -x libmariadb2_2.0.0-1_i386.deb /tmp/extract
   rm libmariadb2_2.0.0-1_i386.deb
-  mv /tmp/extract/usr/lib/i386-linux-gnu/libmariadb.so.2 $HOME/MariaDB/libmariadb.so
+  mv /tmp/extract/usr/lib/i386-linux-gnu/libmariadb.so.2 $HOME/MariaDB/
+  ln -s $HOME/MariaDB/libmariadb.so.2 $HOME/MariaDB/libmariadb.so
   rm -rf /tmp/extract
 fi
