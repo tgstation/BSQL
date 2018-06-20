@@ -11,6 +11,9 @@ Operation.cpp
 MySqlConnectOperation.cpp
 MySqlQueryOperation.cpp
 Query.cpp
+MsSqlConnection.cpp
+MsSqlConnectOperation.cpp
+MsSqlQueryOperation.cpp
 )
 
 if(WIN32) #vcpkg

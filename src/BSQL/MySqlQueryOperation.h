@@ -18,6 +18,8 @@ private:
 	void StartQuery(MYSQL* mysql, std::string&& localQueryText, std::shared_ptr<ClassState> localClassState);
 public:
 	MySqlQueryOperation(MySqlConnection& connPool, std::string&& queryText);
+	MySqlQueryOperation(const MySqlQueryOperation&) = delete;
+	MySqlQueryOperation(MySqlQueryOperation&&) = delete;
 	~MySqlQueryOperation() override;
 
 	bool IsComplete(bool noSkip) override;

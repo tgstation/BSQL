@@ -15,7 +15,6 @@ public:
 	MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database);
 	MySqlConnectOperation(const MySqlConnectOperation&) = delete;
 	MySqlConnectOperation(MySqlConnectOperation&&) = delete;
-	~MySqlConnectOperation() override = default;
 
 	bool IsComplete(bool noSkip) override;
 	bool IsQuery() override;

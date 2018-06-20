@@ -4,6 +4,8 @@ class Library {
 private:
 	unsigned long long identifierCounter;
 
+	SQLHENV mssqlHandle;
+
 	std::map<std::string, std::unique_ptr<Connection>> connections;
 	std::deque<std::thread> zombieThreads;
 public:

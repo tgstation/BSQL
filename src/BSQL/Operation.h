@@ -19,5 +19,5 @@ public:
 
 	virtual bool IsComplete(bool noSkip) = 0;
 	virtual bool IsQuery() = 0;
-	virtual std::thread* GetActiveThread() = 0;
+	virtual std::thread* GetActiveThread();
 };

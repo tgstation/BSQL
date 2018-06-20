@@ -4,6 +4,9 @@
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
 #define BSQL_CONNECTION_TYPE_SQLSERVER "SqlServer"
 
+//special parameters
+#define BSQL_SQLSERVER_USE_INTEGRATED_SECURITY "ok_but_if_someone_in_the_byond_community_actually_makes_this_their_username_they_deserve_to_fail_with_this"
+
 //Call this before rebooting or shutting down your world to clean up gracefully. This invalidates all active connection and operation datums
 /world/proc/BSQL_Shutdown()
 	return
@@ -23,11 +26,11 @@ Create a new database connection, does not perform the actual connect
 	return ..()
 
 /*
-Starts an operation to connect to a database. Should only have 1 successful call
+Starts an operation to connect to a database. Should only have 1 successful call. If it fails the entire connection must be discarded
   ipaddress: The ip/hostname of the target server
   port: The port of the target server
-  username: The username to login to the target server
-  password: The password for the target server
+  username: The username to login to the target server. If called on an SQL Server connection, BSQL_SQLSERVER_USE_INTEGRATED_SECURITY may be used to use windows authentication
+  password: The password for the target server. If using BSQL_SQLSERVER_USE_INTEGRATED_SECURITY this parameter is ignored
   database: Optional database to connect to. Must be used when trying to do database operations, `USE x` is not sufficient
  Returns: A /datum/BSQL_Operation representing the connection or null if an error occurred
 */
@@ -48,6 +51,8 @@ Starts an operation for a query
  Returns: A /datum/BSQL_Operation/Query representing the running query and subsequent result set or null if an error occurred
 
  Note for MariaDB: The underlying connection is pooled. In order to use connection state based properties (i.e. LAST_INSERT_ID()) you can guarantee multiple queries will use the same connection by running BSQL_DEL_CALL(query) on the finished /datum/BSQL_Operation/Query and then creating the next one with another call to BeginQuery() with no sleeps in between
+
+ Note for SqlServer: There is a maximum number of concurrent queries defined by the driver. Query operations will remain running until they can allocate a handle under this limit. Always clean up finished or unused query objects ASAP
 */
 /datum/BSQL_Connection/proc/BeginQuery(query)
 	return

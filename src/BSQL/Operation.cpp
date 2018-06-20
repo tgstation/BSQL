@@ -17,3 +17,7 @@ int Operation::GetErrno() {
 		return -1;
 	return errnum;
 }
+
+std::thread* Operation::GetActiveThread() {
+	return nullptr;
+}
