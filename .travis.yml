@@ -30,5 +30,4 @@ install:
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make VERBOSE=1 && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
-  - ldd tests/libBSQL.so
   - cd tests && ./test_byond.sh
