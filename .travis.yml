@@ -20,8 +20,8 @@ addons:
       - libc6-i386
       - linux-libc-dev:i386
       - libstdc++6:i386
-      - zlib1g
-      - libssl1.0.0
+      - zlib1g:i386
+      - libssl1.0.0:i386
 services:
   - mysql
 install:
@@ -30,9 +30,5 @@ install:
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make VERBOSE=1 && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
-  - ln -s $HOME/MariaDB/libmariadb.so.2 tests/
-  - ln -s $HOME/MariaDB/libmariadb.so.2 ~/.byond/lib/
-  - mkdir -p ~/.byond/bin/
-  - ln -s $HOME/MariaDB/libmariadb.so.2 ~/.byond/bin/
   - ldd tests/libBSQL.so
   - cd tests && ./test_byond.sh
