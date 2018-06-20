@@ -9,6 +9,7 @@ env:
 cache:
   directories:
     - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
+    - $HOME/MariaDB
 addons:
   apt:
     sources:
@@ -17,13 +18,15 @@ addons:
       - g++-7
       - g++-7-multilib
       - libc6-i386
+      - linux-libc-dev:i386
       - libstdc++6:i386
-      - libmariadbclient-dev:i386
+      - zlib1g:i386
+      - libssl1.0.0:i386
 services:
   - mysql
 install:
   - eval "${MATRIX_EVAL}"
-  - build/install_byond.sh
+  - build/install_deps.sh
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
