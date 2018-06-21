@@ -16,6 +16,9 @@ MsSqlConnectOperation.cpp
 MsSqlQueryOperation.cpp
 )
 
+#handled by including FindODBC.cmake
+#find_package(ODBC REQUIRED)
+
 if(WIN32) #vcpkg
 #use static crt
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
@@ -30,6 +33,6 @@ find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql")
 find_library(MARIA_LIBRARY mariadb PATHS ~/MariaDB)
 endif()
 
-include_directories(${MARIA_INCLUDE_DIR})
+include_directories(${MARIA_INCLUDE_DIR} ${ODBC_INCLUDE_DIRS})
 
-target_link_libraries(BSQL ${MARIA_LIBRARY} ${WSLIB})
+target_link_libraries(BSQL ${MARIA_LIBRARY} ${WSLIB} ${ODBC_LIBRARIES})

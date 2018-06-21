@@ -22,7 +22,7 @@ void MySqlConnectOperation::DoConnect(const std::string address, const unsigned 
 	localState->lock.lock();
 	if (localState->alive) {
 		error = mysql_error(localMySql);
-		errnum = mysql_errno(localMySql);
+		errnum = std::to_string(mysql_errno(localMySql));
 		if (result)
 			mysql = localMySql;
 		complete = true;

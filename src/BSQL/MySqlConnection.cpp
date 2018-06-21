@@ -35,13 +35,14 @@ std::string MySqlConnection::Connect(const std::string& address, const unsigned 
 	this->username = username;
 	this->password = password;
 	this->database = database;
-	int tmp;
+
+	std::string tmp;
 	LoadNewConnection(newestConnectionAttemptKey, tmp);
 	newestConnectionAttemptKey = std::string();
 	return operations.begin()->first;
 }
 
-bool MySqlConnection::LoadNewConnection(std::string& fail, int& failno) {
+bool MySqlConnection::LoadNewConnection(std::string& fail, std::string& failno) {
 	if (!newestConnectionAttemptKey.empty()) {
 		//this will chain into calling ReleaseConnection and clear the var
 		auto nca(newestConnectionAttemptKey);
@@ -54,7 +55,7 @@ bool MySqlConnection::LoadNewConnection(std::string& fail, int& failno) {
 			}
 			else {
 				fail = op.GetError();
-				failno = op.GetErrno();
+				failno = op.GetErrorCode();
 				ReleaseOperation(nca);
 			}
 		}
@@ -71,7 +72,7 @@ std::string MySqlConnection::CreateQuery(const std::string& queryText) {
 	return AddOp(std::make_unique<MySqlQueryOperation>(*this, std::string(queryText)));
 }
 
-MYSQL* MySqlConnection::RequestConnection(std::string& fail, int& failno, bool& doNotClose) {
+MYSQL* MySqlConnection::RequestConnection(std::string& fail, std::string& failno, bool& doNotClose) {
 	if (availableConnections.empty() && !LoadNewConnection(fail, failno))
 		return nullptr;
 

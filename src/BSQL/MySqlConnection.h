@@ -14,7 +14,7 @@ private:
 	MYSQL* firstSuccessfulConnection;
 	std::string newestConnectionAttemptKey;
 private:
-	bool LoadNewConnection(std::string& fail, int& failno);
+	bool LoadNewConnection(std::string& fail, std::string& failno);
 public:
 	MySqlConnection(Library& library);
 	~MySqlConnection() override;
@@ -23,6 +23,6 @@ public:
 	std::string CreateQuery(const std::string& queryText) override;
 	std::string Quote(const std::string& str) override;
 
-	MYSQL* RequestConnection(std::string& fail, int& failno, bool& doNotClose);
+	MYSQL* RequestConnection(std::string& fail, std::string& failno, bool& doNotClose);
 	void ReleaseConnection(MYSQL* connection);
 };

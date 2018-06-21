@@ -38,7 +38,7 @@ void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassSt
 		if (tmpErr) {
 			//no it's an error
 			error = mysql_error(mysql);
-			errnum = tmpErr;
+			errnum = std::to_string(tmpErr);
 		}
 	}
 	else if (!noClose)
@@ -101,7 +101,7 @@ void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText,
 			localClassState->lock.lock();
 			if (localClassState->alive) {
 				complete = true;
-				errnum = -1;
+				errnum = "-1";
 				error = "Out of memory!";
 			}
 			else if (!noClose)

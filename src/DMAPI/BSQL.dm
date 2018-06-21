@@ -1,4 +1,4 @@
-//BSQL - DMAPI v1.1.1.0
+//BSQL - DMAPI v1.2.0.0
 
 //types of connections
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
@@ -27,7 +27,7 @@ Create a new database connection, does not perform the actual connect
 
 /*
 Starts an operation to connect to a database. Should only have 1 successful call. If it fails the entire connection must be discarded
-  ipaddress: The ip/hostname of the target server
+  ipaddress: The ip/hostname of the target server. If using BSQL_SQLSERVER_USE_INTEGRATED_SECURITY must be in the form <server name>\<instance name>
   port: The port of the target server
   username: The username to login to the target server. If called on an SQL Server connection, BSQL_SQLSERVER_USE_INTEGRATED_SECURITY may be used to use windows authentication
   password: The password for the target server. If using BSQL_SQLSERVER_USE_INTEGRATED_SECURITY this parameter is ignored
@@ -83,6 +83,8 @@ Get the error message associated with an operation. Should not be used while IsC
 Get the error code associated with an operation. Should not be used while IsComplete() returns FALSE
 
  Returns: The error code, if any. null otherwise
+
+Note for SqlServer: Errors are returned as 5 character strings
 */
 /datum/BSQL_Operation/proc/GetErrorCode()
 	return

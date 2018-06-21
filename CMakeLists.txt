@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 3.0)
 project ("BSQL")
 
 include(build/PrecompiledHeader.cmake)
+include(build/FindODBC.cmake)
 
 # Include sub-projects.
 add_subdirectory ("src/BSQL")

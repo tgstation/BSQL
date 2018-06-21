@@ -1,6 +1,6 @@
 #include "BSQL.h"
 
-Library::Library() noexcept :
+Library::Library() :
 	identifierCounter(0)
 {
 	auto res(SQLAllocEnv(&mssqlHandle));
@@ -14,7 +14,7 @@ Library::Library() noexcept :
 	mysql_library_init(0, nullptr, nullptr);
 }
 
-Library::~Library() noexcept {
+Library::~Library() {
 	for (auto& I : zombieThreads)
 		I.join();
 

@@ -1,6 +1,6 @@
 #pragma once
 
-class MsSqlConnectOperation : Operation {
+class MsSqlConnectOperation : public Operation {
 private:
 	const SQLHDBC connectionHandle;
 	const std::string connectionString;

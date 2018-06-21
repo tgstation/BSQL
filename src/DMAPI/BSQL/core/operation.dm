@@ -33,7 +33,9 @@ BSQL_DEL_PROC(/datum/BSQL_Operation)
 /datum/BSQL_Operation/GetErrorCode()
 	if(BSQL_IS_DELETED(connection))
 		return -2
-	return text2num(world._BSQL_Internal_Call("GetErrorCode", connection.id, id))
+	. = world._BSQL_Internal_Call("GetErrorCode", connection.id, id)
+	if(connection.connection_type == BSQL_CONNECTION_TYPE_MARIADB)
+		return text2num(.)
 
 /datum/BSQL_Operation/WaitForCompletion()
 	if(BSQL_IS_DELETED(connection))

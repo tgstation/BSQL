@@ -8,14 +8,13 @@ protected:
 		bool alive = true;
 	};
 protected:
-	int errnum;
+	std::string errnum;
 	std::string error;
 public:
 	virtual ~Operation() = default;
 
 	std::string GetError();
 	std::string GetErrorCode();
-	int GetErrno();
 
 	virtual bool IsComplete(bool noSkip) = 0;
 	virtual bool IsQuery() = 0;

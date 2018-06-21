@@ -1,13 +1,14 @@
 #pragma once
 
-class MsSqlQueryOperation : Query {
+class MsSqlQueryOperation : public Query {
 private:
 	const SQLHDBC connectionHandle;
 	const std::string queryText;
 	SQLHSTMT statementHandle;
 	SQLUINTEGER maximum;
+	SQLSMALLINT resultColumnCount;
 	unsigned int& currentStatementCount;
-	bool complete;
+	bool executed, complete;
 public:
 	MsSqlQueryOperation(SQLHDBC connectionHandle, const std::string& queryText, unsigned int& currentStatementCount);
 	MsSqlQueryOperation(const MsSqlQueryOperation&) = delete;

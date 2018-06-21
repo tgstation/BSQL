@@ -27,9 +27,12 @@ BSQL_DEL_PROC(/datum/BSQL_Connection)
 		BSQL_ERROR(error)
 
 /datum/BSQL_Connection/BeginConnect(ipaddress, port, username, password, database)
-	if(password == null && connection_type == BSQL_CONNECTION_TYPE_SQLSERVER)
-		//little thing to allow sanity with sql server
-		password = ""
+	//little thing to allow sanity with sql server
+	if(connection_type == BSQL_CONNECTION_TYPE_SQLSERVER)
+		if(password == null)
+			password = ""
+		if(port == null)
+			port = 0
 	var/error = world._BSQL_Internal_Call("OpenConnection", id, ipaddress, "[port]", username, password, database)
 	if(error)
 		BSQL_ERROR(error)

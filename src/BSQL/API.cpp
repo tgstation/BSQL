@@ -101,8 +101,7 @@ extern "C" {
 			if (conType == "MySql")
 				type = Connection::Type::MySql;
 			else if (conType == "SqlServer")
-				//type = Connection::Type::SqlServer;
-				return "SqlServer is not supported in this release!";
+				type = Connection::Type::SqlServer;
 			else
 				return "Invalid connection type!";
 		}

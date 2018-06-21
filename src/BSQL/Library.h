@@ -9,8 +9,8 @@ private:
 	std::map<std::string, std::unique_ptr<Connection>> connections;
 	std::deque<std::thread> zombieThreads;
 public:
-	Library() noexcept;
-	~Library() noexcept;
+	Library();
+	~Library();
 
 	std::string CreateConnection(Connection::Type connectionType) noexcept;
 	Connection* GetConnection(const std::string& identifier) noexcept;

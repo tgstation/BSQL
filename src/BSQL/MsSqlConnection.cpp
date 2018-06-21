@@ -34,3 +34,23 @@ std::string MsSqlConnection::Connect(const std::string& address, const unsigned 
 	connectionStarted = true;
 	return AddOp(std::make_unique<MsSqlConnectOperation>(connectionHandle, address, port, username, password, database, connected));
 }
+
+//stack overflow copypasta
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return str;
+}
+
+std::string MsSqlConnection::Quote(const std::string& str) {
+	return ReplaceAll(str, "'", "\\'");
+}
+
+std::string MsSqlConnection::CreateQuery(const std::string& queryText) {
+	if (!connected)
+		return std::string();
+	return AddOp(std::make_unique<MsSqlQueryOperation>(connectionHandle, queryText, currentStatementCount));
+}

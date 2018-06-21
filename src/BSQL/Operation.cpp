@@ -9,12 +9,6 @@ std::string Operation::GetError() {
 std::string Operation::GetErrorCode() {
 	if (!IsComplete(true))
 		return std::string();
-	return std::to_string(errnum);
-}
-
-int Operation::GetErrno() {
-	if (!IsComplete(true))
-		return -1;
 	return errnum;
 }
 
