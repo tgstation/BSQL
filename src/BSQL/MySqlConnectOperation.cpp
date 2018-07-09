@@ -13,9 +13,9 @@ MYSQL* MySqlConnectOperation::InitMySql(const unsigned int timeout) {
 	const auto res(mysql_init(nullptr));
 	if (!res)
 		throw std::bad_alloc();
-	mysql_optionsv(res, MYSQL_OPT_CONNECT_TIMEOUT, static_cast<const void*>(&timeout));
-	mysql_optionsv(res, MYSQL_OPT_READ_TIMEOUT, static_cast<const void*>(&timeout));
-	mysql_optionsv(res, MYSQL_OPT_WRITE_TIMEOUT, static_cast<const void*>(&timeout));
+	mysql_options(res, MYSQL_OPT_CONNECT_TIMEOUT, static_cast<const void*>(&timeout));
+	mysql_options(res, MYSQL_OPT_READ_TIMEOUT, static_cast<const void*>(&timeout));
+	mysql_options(res, MYSQL_OPT_WRITE_TIMEOUT, static_cast<const void*>(&timeout));
 	return res;
 }
 
