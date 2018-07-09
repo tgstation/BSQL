@@ -121,7 +121,7 @@ extern "C" {
 		if (blockingTimeout < 0)
 			return "blockingTimeout must be an unsigned integer!";
 		
-		if (asyncTimeout != 0 && blockingTimeout < asyncTimeout)
+		if (asyncTimeout != 0 && blockingTimeout > asyncTimeout)
 			return "asyncTimeout must be greater than or equal to blockingTimeout";
 
 		if (!lastCreatedConnection.empty())
