@@ -44,38 +44,13 @@
 	var/pass = world.params["dbpass"]
 	var/db = world.params["dbdb"]
 
-	var/datum/BSQL_Connection/test_timeout = new(BSQL_CONNECTION_TYPE_MARIADB, 8, 4)
-	var/start_time = world.time
-	var/datum/BSQL_Operation/connectOp = test_timeout.BeginConnect("fake.url.asdfasdfasdfjhkdfnkdfjkdfjk.co.uk", port, user, pass, null)
-	
-	if(connectOp.WaitForCompletion())
-		CRASH("No blocking timeout! Error: [connectOp.GetError()]")
-
-	var/timeout_time = world.time - start_time
-	if(timeout_time < 30)
-		CRASH("Timeout too short")
-	else if(timeout_time > 50)
-		CRASH("Timeout too long")
-		
-	WaitOp(connectOp)
-	var/error = connectOp.GetError()
-	if(!error)
-		CRASH("No async timeout error!")
-	world.log << "Timeout connect error: [error]"
-
-	timeout_time = world.time - start_time
-	if(timeout_time < 70)
-		CRASH("Async timeout too short")
-	else if(timeout_time > 80)
-		CRASH("Async timeout too long")
-
 	var/datum/BSQL_Connection/conn = new(BSQL_CONNECTION_TYPE_MARIADB)
 	world.log << "Root connection id: [conn.id]"
-	connectOp = conn.BeginConnect(host, port, user, pass, null)
+	var/datum/BSQL_Operation/connectOp = conn.BeginConnect(host, port, user, pass, null)
 	world.log << "Connect op id: [connectOp.id]"
 
 	WaitOp(connectOp)
-	error = connectOp.GetError()
+	var/error = connectOp.GetError()
 	if(error)
 		CRASH(error)
 	del(connectOp)
@@ -109,14 +84,15 @@
 
 	q = conn.BeginQuery("CREATE DATABASE [quoted_db]");
 	world.log << "Create db op id: [q.id]"
-	q.WaitForCompletion()
+	if(!q.WaitForCompletion())
+		CRASH("WaitForCompletion timed out")
 	if(!q.IsComplete())
 		CRASH("Wait for completion didn't work!")
 	error = q.GetError()
 	if(error)
 		CRASH(error)
 
-	conn = new(BSQL_CONNECTION_TYPE_MARIADB)
+	conn = new(BSQL_CONNECTION_TYPE_MARIADB, 8, 4)
 	world.log << "Db connection id: [conn.id]"
 	connectOp = conn.BeginConnect(host, port, user, pass, db)
 	world.log << "Db connect op id: [connectOp.id]"
@@ -186,6 +162,25 @@
 	results = q.CurrentRow()
 	if(results)
 		CRASH("Expected no third row! Got: [json_encode(results)] !")
+	
+	q = conn.BeginQuery("LOCK TABLES asdf WRITE")
+	world.log << "Lock query id: [q.id]"
+	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH(error)
+
+	q2 = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES ('[time2text(world.timeofday, "YYYY-MM-DD hh:mm:ss")]', 435)")
+	world.log << "Insert 3 op id: [q2.id]"
+
+	if(q2.WaitForCompletion())
+		CRASH("Insert didn't blocking timeout!")
+	
+	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH("Insert 3 didn't async timeout!")
+	world.log << "Insert 3 async timeout error: [error]"
 
 	del(q)
 	del(conn)
