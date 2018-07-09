@@ -27,7 +27,7 @@ BSQL_DEL_PROC(/datum/BSQL_Operation)
 
 /datum/BSQL_Operation/GetError()
 	if(BSQL_IS_DELETED(connection))
-		return
+		return "Connection deleted!"
 	return world._BSQL_Internal_Call("GetError", connection.id, id)
 
 /datum/BSQL_Operation/GetErrorCode()
