@@ -46,7 +46,7 @@
 
 	var/datum/BSQL_Connection/test_timeout = new(BSQL_CONNECTION_TYPE_MARIADB, 8, 4)
 	var/start_time = world.time
-	var/datum/BSQL_Operation/connectOp = conn.BeginConnect("fake.url.asdfasdfasdfjhkdfnkdfjkdfjk.co.uk", port, user, pass, null)
+	var/datum/BSQL_Operation/connectOp = test_timeout.BeginConnect("fake.url.asdfasdfasdfjhkdfnkdfjkdfjk.co.uk", port, user, pass, null)
 	
 	if(connectOp.WaitForCompletion())
 		CRASH("No blocking timeout")
