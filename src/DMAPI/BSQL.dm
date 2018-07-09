@@ -1,4 +1,4 @@
-//BSQL - DMAPI v1.1.1.0
+//BSQL - DMAPI v1.2.0.0
 
 //types of connections
 #define BSQL_CONNECTION_TYPE_MARIADB "MySql"
