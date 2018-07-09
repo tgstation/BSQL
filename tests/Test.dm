@@ -37,7 +37,7 @@
 
 /proc/Test()
 	world.log << "Beginning test"
-
+	
 	var/host = world.params["dbhost"]
 	var/user = world.params["dbuser"]
 	var/port = text2num(world.params["dbport"])
@@ -92,7 +92,7 @@
 	if(error)
 		CRASH(error)
 
-	conn = new(BSQL_CONNECTION_TYPE_MARIADB, 8, 4)
+	conn = new(BSQL_CONNECTION_TYPE_MARIADB)
 	world.log << "Db connection id: [conn.id]"
 	connectOp = conn.BeginConnect(host, port, user, pass, db)
 	world.log << "Db connect op id: [connectOp.id]"
@@ -169,18 +169,6 @@
 	error = q.GetError()
 	if(error)
 		CRASH(error)
-
-	q2 = conn.BeginQuery("INSERT INTO asdf (datetime, round_id) VALUES ('[time2text(world.timeofday, "YYYY-MM-DD hh:mm:ss")]', 435)")
-	world.log << "Insert 3 op id: [q2.id]"
-
-	if(q2.WaitForCompletion())
-		CRASH("Insert didn't blocking timeout!")
-	
-	WaitOp(q)
-	error = q.GetError()
-	if(error)
-		CRASH("Insert 3 didn't async timeout!")
-	world.log << "Insert 3 async timeout error: [error]"
 
 	del(q)
 	del(conn)
