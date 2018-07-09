@@ -1,18 +1,21 @@
 #include "BSQL.h"
 
-MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) :
+MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database, const unsigned int timeout) :
 	connPool(connPool),
 	mysql(nullptr),
 	complete(false),
 	state(std::make_shared<ClassState>()),
-	connectThread(&MySqlConnectOperation::DoConnect, this, address, port, username, password, database, InitMySql(), state)
+	connectThread(&MySqlConnectOperation::DoConnect, this, address, port, username, password, database, InitMySql(timeout), state)
 {
 }
 
-MYSQL* MySqlConnectOperation::InitMySql() {
+MYSQL* MySqlConnectOperation::InitMySql(const unsigned int timeout) {
 	const auto res(mysql_init(nullptr));
 	if (!res)
 		throw std::bad_alloc();
+	mysql_optionsv(res, MYSQL_OPT_CONNECT_TIMEOUT, static_cast<const void*>(&timeout));
+	mysql_optionsv(res, MYSQL_OPT_READ_TIMEOUT, static_cast<const void*>(&timeout));
+	mysql_optionsv(res, MYSQL_OPT_WRITE_TIMEOUT, static_cast<const void*>(&timeout));
 	return res;
 }
 

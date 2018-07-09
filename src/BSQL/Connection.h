@@ -7,6 +7,7 @@ public:
 		SqlServer
 	};
 public:
+	const unsigned int blockingTimeout;
 	const Type type;
 protected:
 	Library & library;
@@ -14,7 +15,7 @@ protected:
 private:
 	unsigned long long identifierCounter;
 protected:
-	Connection(Type type, Library& library);
+	Connection(Type type, Library& library, const unsigned int blockingTimeout);
 
 	std::string AddOp(std::unique_ptr<Operation>&& operation);
 public:

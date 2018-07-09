@@ -10,7 +10,7 @@ public:
 	Library() noexcept;
 	~Library() noexcept;
 
-	std::string CreateConnection(Connection::Type connectionType) noexcept;
+	std::string CreateConnection(Connection::Type connectionType, const unsigned int asyncTimeout, const unsigned int blockingTimeout) noexcept;
 	Connection* GetConnection(const std::string& identifier) noexcept;
 	bool ReleaseConnection(const std::string& identifier) noexcept;
 	void RegisterZombieThread(std::thread&& thread) noexcept;

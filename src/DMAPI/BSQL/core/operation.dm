@@ -27,7 +27,7 @@ BSQL_DEL_PROC(/datum/BSQL_Operation)
 
 /datum/BSQL_Operation/GetError()
 	if(BSQL_IS_DELETED(connection))
-		return "Connection deleted!"
+		return
 	return world._BSQL_Internal_Call("GetError", connection.id, id)
 
 /datum/BSQL_Operation/GetErrorCode()
@@ -40,4 +40,8 @@ BSQL_DEL_PROC(/datum/BSQL_Operation)
 		return
 	var/error = world._BSQL_Internal_Call("BlockOnOperation", connection.id, id)
 	if(error)
+		if(error == "Operation timed out!")	//match this with the implementation
+			return FALSE
 		BSQL_ERROR("Error waiting for operation [id] for connection [connection.id]! [error]")
+		return
+	return TRUE

@@ -44,13 +44,27 @@
 	var/pass = world.params["dbpass"]
 	var/db = world.params["dbdb"]
 
+	var/datum/BSQL_Connection/test_timeout = new(BSQL_CONNECTION_TYPE_MARIADB, 10, 5)
+	var/start_time = world.time
+	var/datum/BSQL_Operation/connectOp = conn.BeginConnect("fake.url.asdfasdfasdfjhkdfnkdfjkdfjk.co.uk", port, user, pass, null)
+	WaitOp(connectOp)
+	var/error = connectOp.GetError()
+	if(!error)
+		CRASH("No async timeout error!")
+	var/timeout_time = world.time - start_time
+	if(timeout_time < 90)
+		CRASH("Timeout too long")
+	if(world.time - start_time > 110)
+		CRASH("Timeout too short")
+
+
 	var/datum/BSQL_Connection/conn = new(BSQL_CONNECTION_TYPE_MARIADB)
 	world.log << "Root connection id: [conn.id]"
-	var/datum/BSQL_Operation/connectOp = conn.BeginConnect(host, port, user, pass, null)
+	connectOp = conn.BeginConnect(host, port, user, pass, null)
 	world.log << "Connect op id: [connectOp.id]"
 
 	WaitOp(connectOp)
-	var/error = connectOp.GetError()
+	error = connectOp.GetError()
 	if(error)
 		CRASH(error)
 	del(connectOp)

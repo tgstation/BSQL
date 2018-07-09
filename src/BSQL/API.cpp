@@ -90,12 +90,18 @@ extern "C" {
 	}
 
 	BYOND_FUNC CreateConnection(const int argumentCount, const char* const* const args) noexcept {
-		if (argumentCount != 1)
+		if (argumentCount != 3)
 			return "Invalid arguments!";
 		if (!library)
 			return "Library not initialized!";
 		const auto& connectionType(args[0]);
+		const auto& asyncTimeoutStr(args[1]);
+		const auto& blockingTimeoutStr(args[2]);
 		Connection::Type type;
+
+		const auto asyncTimeout(std::atoi(asyncTimeoutStr));
+		const auto blockingTimeout(std::atoi(blockingTimeoutStr));
+
 		try {
 			std::string conType(connectionType);
 			if (conType == "MySql")
@@ -110,11 +116,19 @@ extern "C" {
 			return "Out of memory!";
 		}
 
+		if (asyncTimeout < 0)
+			return "asyncTimeout must be an unsigned integer!";
+		if (blockingTimeout < 0)
+			return "blockingTimeout must be an unsigned integer!";
+		
+		if (asyncTimeout != 0 && blockingTimeout < asyncTimeout)
+			return "asyncTimeout must be greater than or equal to blockingTimeout";
+
 		if (!lastCreatedConnection.empty())
 			//guess they didn't want it
 			library->ReleaseConnection(lastCreatedConnection);
 
-		auto result(library->CreateConnection(type));
+		auto result(library->CreateConnection(type, static_cast<unsigned int>(asyncTimeout), static_cast<unsigned int>(blockingTimeout)));
 		if (result.empty())
 			return "Out of memory";
 
@@ -339,8 +353,11 @@ extern "C" {
 			auto op(connection->GetOperation(operationIdentifier));
 			if (!op)
 				return "Operation identifier does not exist!";
-			while (!op->IsComplete(false))
+			auto I(0U);
+			for (; !op->IsComplete(false) && I < connection->blockingTimeout * 1000; ++I)
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			if (I >= connection->blockingTimeout * 1000)
+				return "Operation timed out!";	//match this with the api, too lazy to do it any other way
 			return nullptr;
 		}
 		catch (std::bad_alloc&) {

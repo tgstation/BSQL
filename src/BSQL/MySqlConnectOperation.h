@@ -8,11 +8,12 @@ private:
 	bool complete;
 	std::shared_ptr<ClassState> state;
 	std::thread connectThread;
+	
 private:
-	static MYSQL* InitMySql();
+	static MYSQL* InitMySql(const unsigned int timeout);
 	void DoConnect(const std::string address, const unsigned short port, const std::string username, const std::string password, const std::string database, MYSQL* localMySql, std::shared_ptr<ClassState> localState);
 public:
-	MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database);
+	MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database, const unsigned int timeout);
 	MySqlConnectOperation(const MySqlConnectOperation&) = delete;
 	MySqlConnectOperation(MySqlConnectOperation&&) = delete;
 	~MySqlConnectOperation() override = default;
