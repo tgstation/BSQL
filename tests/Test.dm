@@ -49,7 +49,7 @@
 	var/datum/BSQL_Operation/connectOp = test_timeout.BeginConnect("fake.url.asdfasdfasdfjhkdfnkdfjkdfjk.co.uk", port, user, pass, null)
 	
 	if(connectOp.WaitForCompletion())
-		CRASH("No blocking timeout")
+		CRASH("No blocking timeout! Error: [connectOp.GetError()]")
 
 	var/timeout_time = world.time - start_time
 	if(timeout_time < 30)
