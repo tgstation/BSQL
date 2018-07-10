@@ -8,15 +8,17 @@ private:
 	std::string username;
 	std::string password;
 	std::string database;
-	unsigned short port;
 
 	std::stack<MYSQL*> availableConnections;
 	MYSQL* firstSuccessfulConnection;
 	std::string newestConnectionAttemptKey;
+
+	const unsigned int asyncTimeout;
+	unsigned short port;
 private:
 	bool LoadNewConnection(std::string& fail, int& failno);
 public:
-	MySqlConnection(Library& library);
+	MySqlConnection(Library& library, const unsigned int asyncTimeout, const unsigned int blockingTimeout);
 	~MySqlConnection() override;
 
 	std::string Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) override;

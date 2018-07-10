@@ -37,7 +37,7 @@
 
 /proc/Test()
 	world.log << "Beginning test"
-
+	
 	var/host = world.params["dbhost"]
 	var/user = world.params["dbuser"]
 	var/port = text2num(world.params["dbport"])
@@ -84,7 +84,8 @@
 
 	q = conn.BeginQuery("CREATE DATABASE [quoted_db]");
 	world.log << "Create db op id: [q.id]"
-	q.WaitForCompletion()
+	if(!q.WaitForCompletion())
+		CRASH("WaitForCompletion timed out")
 	if(!q.IsComplete())
 		CRASH("Wait for completion didn't work!")
 	error = q.GetError()
@@ -161,6 +162,13 @@
 	results = q.CurrentRow()
 	if(results)
 		CRASH("Expected no third row! Got: [json_encode(results)] !")
+	
+	q = conn.BeginQuery("LOCK TABLES asdf WRITE")
+	world.log << "Lock query id: [q.id]"
+	WaitOp(q)
+	error = q.GetError()
+	if(error)
+		CRASH(error)
 
 	del(q)
 	del(conn)

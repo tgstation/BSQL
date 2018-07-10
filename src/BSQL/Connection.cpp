@@ -1,6 +1,7 @@
 #include "BSQL.h"
 
-Connection::Connection(Type type, Library& library) :
+Connection::Connection(Type type, Library& library, const unsigned int blockingTimeout) :
+	blockingTimeout(blockingTimeout),
 	library(library),
 	type(type),
 	identifierCounter(0)
