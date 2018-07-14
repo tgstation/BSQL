@@ -358,6 +358,8 @@ extern "C" {
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			if (I >= connection->blockingTimeout * 1000)
 				return "Operation timed out!";	//match this with the api, too lazy to do it any other way
+			if (op->IsQuery())
+				lastRow = static_cast<Query*>(op)->CurrentRow();
 			return nullptr;
 		}
 		catch (std::bad_alloc&) {
