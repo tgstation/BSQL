@@ -76,13 +76,14 @@ void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText,
 				else
 					json.append(",");
 				json.append("\"");
-				json.append(field->name);
+				
+				json.append(Library::EscapeJsonString(field->name));
 				json.append("\":");
 				if (row[I] == nullptr)
 					json.append("null");
 				else {
 					json.append("\"");
-					json.append(row[I]);
+					json.append(Library::EscapeJsonString(row[I]));
 					json.append("\"");
 				}
 			}

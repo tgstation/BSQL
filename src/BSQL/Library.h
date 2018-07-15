@@ -10,6 +10,8 @@ public:
 	Library() noexcept;
 	~Library() noexcept;
 
+	static std::string EscapeJsonString(const std::string& str);
+
 	std::string CreateConnection(Connection::Type connectionType, const unsigned int asyncTimeout, const unsigned int blockingTimeout) noexcept;
 	Connection* GetConnection(const std::string& identifier) noexcept;
 	bool ReleaseConnection(const std::string& identifier) noexcept;
