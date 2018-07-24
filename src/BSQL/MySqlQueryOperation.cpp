@@ -29,7 +29,7 @@ std::thread MySqlQueryOperation::TryStart() {
 			return std::thread();
 		}
 	}
-	if (threadCounter.fetch_add(1) >= threadLimit) {
+	if (threadCounter.fetch_add(1) > threadLimit) {
 		--threadCounter;
 		return std::thread();
 	}

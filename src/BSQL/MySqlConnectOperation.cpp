@@ -19,7 +19,7 @@ MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const st
 }
 
 void MySqlConnectOperation::TryStartConnecting() {
-	if (threadCounter.fetch_add(1) >= threadLimit) {
+	if (threadCounter.fetch_add(1) > threadLimit) {
 		--threadCounter;
 		return;
 	}
