@@ -1,12 +1,30 @@
 #include "BSQL.h"
 
-MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database, const unsigned int timeout) :
+MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database, const unsigned int timeout, std::atomic_uint_fast32_t& threadCounter, const unsigned int threadLimit) :
 	connPool(connPool),
 	mysql(nullptr),
+	address(address),
+	username(username),
+	password(password),
+	database(database),
+	port(port),
 	complete(false),
+	started(false),
 	state(std::make_shared<ClassState>()),
-	connectThread(&MySqlConnectOperation::DoConnect, this, address, port, username, password, database, InitMySql(timeout), state)
+	threadCounter(threadCounter),
+	threadLimit(threadLimit),
+	timeout(timeout)
 {
+	TryStartConnecting();
+}
+
+void MySqlConnectOperation::TryStartConnecting() {
+	if (threadCounter.fetch_add(1) > threadLimit) {
+		--threadCounter;
+		return;
+	}
+	started = true;
+	connectThread = std::thread(&MySqlConnectOperation::DoConnect, this, InitMySql(timeout), state);
 }
 
 MYSQL* MySqlConnectOperation::InitMySql(const unsigned int timeout) {
@@ -19,7 +37,7 @@ MYSQL* MySqlConnectOperation::InitMySql(const unsigned int timeout) {
 	return res;
 }
 
-void MySqlConnectOperation::DoConnect(const std::string address, const unsigned short port, const std::string username, const std::string password, const std::string database, MYSQL* localMySql, std::shared_ptr<ClassState> localState) {
+void MySqlConnectOperation::DoConnect(MYSQL* localMySql, std::shared_ptr<ClassState> localState) {
 	mysql_thread_init();
 	const auto result(mysql_real_connect(localMySql, address.c_str(), username.c_str(), password.c_str(), database.empty() ? nullptr : database.c_str(), port, nullptr, 0));
 	localState->lock.lock();
@@ -34,6 +52,7 @@ void MySqlConnectOperation::DoConnect(const std::string address, const unsigned 
 		mysql_close(localMySql);
 	mysql_thread_end();
 	localState->lock.unlock();
+	--threadCounter;
 }
 
 bool MySqlConnectOperation::IsQuery() {
@@ -41,6 +60,11 @@ bool MySqlConnectOperation::IsQuery() {
 }
 
 bool MySqlConnectOperation::IsComplete(bool noSkip) {
+	if (!started) {
+		TryStartConnecting();
+		return false;
+	}
+
 	if (!complete)
 		return false;
 
@@ -54,6 +78,9 @@ bool MySqlConnectOperation::IsComplete(bool noSkip) {
 }
 
 std::thread* MySqlConnectOperation::GetActiveThread() {
+	if (!started)
+		return nullptr;
+
 	state->lock.lock();
 
 	if (IsComplete(false)) {

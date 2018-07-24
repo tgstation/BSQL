@@ -1,9 +1,11 @@
 #include "BSQL.h"
 
-MySqlConnection::MySqlConnection(Library& library, const unsigned int asyncTimeout, const unsigned int blockingTimeout) :
+MySqlConnection::MySqlConnection(Library& library, const unsigned int asyncTimeout, const unsigned int blockingTimeout, const unsigned int threadLimit) :
 	Connection(Type::MySql, library, blockingTimeout),
 	firstSuccessfulConnection(nullptr),
-	asyncTimeout(asyncTimeout)
+	asyncTimeout(asyncTimeout),
+	threadLimit(threadLimit),
+	threadCounter(0)
 {}
 
 MySqlConnection::~MySqlConnection() {
@@ -63,13 +65,13 @@ bool MySqlConnection::LoadNewConnection(std::string& fail, int& failno) {
 			return false;
 	}
 
-	newestConnectionAttemptKey = AddOp(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password, database, asyncTimeout));
+	newestConnectionAttemptKey = AddOp(std::make_unique<MySqlConnectOperation>(*this, address, port, username, password, database, asyncTimeout, threadCounter, threadLimit));
 
 	return false;
 }
 
 std::string MySqlConnection::CreateQuery(const std::string& queryText) {
-	return AddOp(std::make_unique<MySqlQueryOperation>(*this, std::string(queryText)));
+	return AddOp(std::make_unique<MySqlQueryOperation>(*this, std::string(queryText), threadCounter, threadLimit));
 }
 
 MYSQL* MySqlConnection::RequestConnection(std::string& fail, int& failno, bool& doNotClose) {

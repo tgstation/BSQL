@@ -12,7 +12,7 @@ public:
 
 	static std::string EscapeJsonString(const std::string& str);
 
-	std::string CreateConnection(Connection::Type connectionType, const unsigned int asyncTimeout, const unsigned int blockingTimeout) noexcept;
+	std::string CreateConnection(Connection::Type connectionType, const unsigned int asyncTimeout, const unsigned int blockingTimeout, const unsigned int threadLimit) noexcept;
 	Connection* GetConnection(const std::string& identifier) noexcept;
 	bool ReleaseConnection(const std::string& identifier) noexcept;
 	void RegisterZombieThread(std::thread&& thread) noexcept;

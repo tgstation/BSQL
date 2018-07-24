@@ -1,6 +1,6 @@
 #include "BSQL.h"
 
-MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&& queryText) :
+MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&& queryText, std::atomic_uint_fast32_t& threadCounter, const unsigned int threadLimit) :
 	queryText(std::move(queryText)),
 	connPool(connPool),
 	connection(nullptr),
@@ -8,6 +8,8 @@ MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&
 	connectionAttempts(0),
 	started(false),
 	complete(false),
+	threadCounter(threadCounter),
+	threadLimit(threadLimit),
 	operationThread(TryStart())
 {
 }
@@ -19,10 +21,16 @@ MySqlQueryOperation::~MySqlQueryOperation() {
 }
 
 std::thread MySqlQueryOperation::TryStart() {
-	connection = connPool.RequestConnection(error, errnum, noClose);
 	if (!connection) {
-		if (!error.empty())
-			complete = ++connectionAttempts == 3;
+		connection = connPool.RequestConnection(error, errnum, noClose);
+		if (!connection) {
+			if (!error.empty())
+				complete = ++connectionAttempts == 3;
+			return std::thread();
+		}
+	}
+	if (threadCounter.fetch_add(1) > threadLimit) {
+		--threadCounter;
 		return std::thread();
 	}
 	started = true;
@@ -45,6 +53,7 @@ void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassSt
 		mysql_close(mysql);
 	mysql_thread_end();
 	localClassState->lock.unlock();
+	--threadCounter;
 }
 
 void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText, std::shared_ptr<ClassState> localClassState) {
@@ -109,6 +118,7 @@ void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText,
 				mysql_close(mysql);
 			mysql_thread_end();
 			localClassState->lock.unlock();
+			--threadCounter;
 			return;
 		}
 	}
