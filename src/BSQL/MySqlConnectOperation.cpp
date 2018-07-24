@@ -52,6 +52,7 @@ void MySqlConnectOperation::DoConnect(MYSQL* localMySql, std::shared_ptr<ClassSt
 		mysql_close(localMySql);
 	mysql_thread_end();
 	localState->lock.unlock();
+	--threadCounter;
 }
 
 bool MySqlConnectOperation::IsQuery() {
