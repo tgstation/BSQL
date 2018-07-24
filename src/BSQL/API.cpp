@@ -30,6 +30,10 @@ const char* TryLoadQuery(const int argumentCount, const char* const* const args,
 }
 
 extern "C" {
+	BYOND_FUNC Version(const int argumentCount, const char* const* const args) noexcept {
+		return "v1.3.0.0";
+	}
+
 	BYOND_FUNC Initialize(const int argumentCount, const char* const* const args) noexcept {
 		try {
 			library = std::make_unique<Library>();
@@ -90,17 +94,19 @@ extern "C" {
 	}
 
 	BYOND_FUNC CreateConnection(const int argumentCount, const char* const* const args) noexcept {
-		if (argumentCount != 3)
+		if (argumentCount != 4)
 			return "Invalid arguments!";
 		if (!library)
 			return "Library not initialized!";
 		const auto& connectionType(args[0]);
 		const auto& asyncTimeoutStr(args[1]);
 		const auto& blockingTimeoutStr(args[2]);
+		const auto& threadLimitStr(args[3]);
 		Connection::Type type;
 
 		const auto asyncTimeout(std::atoi(asyncTimeoutStr));
 		const auto blockingTimeout(std::atoi(blockingTimeoutStr));
+		const auto threadLimit(std::atoi(threadLimitStr));
 
 		try {
 			std::string conType(connectionType);
@@ -124,11 +130,14 @@ extern "C" {
 		if (asyncTimeout != 0 && blockingTimeout > asyncTimeout)
 			return "asyncTimeout must be greater than or equal to blockingTimeout";
 
+		if (threadLimit <= 0)
+			return "threadLimit must be greater than zero!";
+
 		if (!lastCreatedConnection.empty())
 			//guess they didn't want it
 			library->ReleaseConnection(lastCreatedConnection);
 
-		auto result(library->CreateConnection(type, static_cast<unsigned int>(asyncTimeout), static_cast<unsigned int>(blockingTimeout)));
+		auto result(library->CreateConnection(type, static_cast<unsigned int>(asyncTimeout), static_cast<unsigned int>(blockingTimeout), static_cast<unsigned int>(threadLimit)));
 		if (result.empty())
 			return "Out of memory";
 

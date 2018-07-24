@@ -7,6 +7,7 @@
 
 #include <mysql/mysql.h>
 
+#include <atomic>
 #include <chrono>
 #include <deque>
 #include <limits>
