@@ -23,7 +23,7 @@ add_precompiled_header(BSQL BSQL.h FORCEINCLUDE)
 set(WSLIB ws2_32)
 else() #system package, this pmuch only works for travis
 set_target_properties(BSQL PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
-find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql")
+find_path(MARIA_INCLUDE_DIR NAMES "mysql.h" PATHS "/usr/include/mysql" "/usr/include/mariadb")
 find_library(MARIA_LIBRARY mariadb PATHS ~/MariaDB /usr/lib/i386-linux-gnu/)
 endif()
 
