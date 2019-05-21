@@ -22,6 +22,7 @@ addons:
       - libstdc++6:i386
       - zlib1g:i386
       - libssl1.0.0:i386
+      - libmariadb-client-lgpl-dev:i386
 services:
   - mysql
 install:
