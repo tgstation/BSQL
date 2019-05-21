@@ -22,8 +22,6 @@ else
   echo "Setting up MariaDB."
   rm -rf "$HOME/MariaDB"
   mkdir -p "$HOME/MariaDB"
-	apt-get install mariadb-client-lgpl
   cp /usr/lib/i386-linux-gnu/libmariadb.so.2 $HOME/MariaDB/
   ln -s $HOME/MariaDB/libmariadb.so.2 $HOME/MariaDB/libmariadb.so
-  rm -rf /tmp/extract
 fi
