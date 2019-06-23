@@ -6,6 +6,7 @@ protected:
 	struct ClassState {
 		std::mutex lock;
 		bool alive = true;
+		bool zombie = false;
 	};
 protected:
 	int errnum;

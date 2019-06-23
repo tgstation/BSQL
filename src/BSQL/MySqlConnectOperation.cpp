@@ -18,6 +18,12 @@ MySqlConnectOperation::MySqlConnectOperation(MySqlConnection& connPool, const st
 	TryStartConnecting();
 }
 
+MySqlConnectOperation::~MySqlConnectOperation() {
+	state->lock.lock();
+	state->alive = false;
+	state->zombie = true;
+	state->lock.unlock();
+}
 void MySqlConnectOperation::TryStartConnecting() {
 	if (threadCounter.fetch_add(1) > threadLimit) {
 		--threadCounter;
@@ -51,6 +57,10 @@ void MySqlConnectOperation::DoConnect(MYSQL* localMySql, std::shared_ptr<ClassSt
 	if (!result || !localState->alive)
 		mysql_close(localMySql);
 	mysql_thread_end();
+	if (localState->zombie) {
+		localState->lock.unlock();
+		return;
+	}
 	localState->lock.unlock();
 	--threadCounter;
 }

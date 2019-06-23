@@ -93,7 +93,8 @@ void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 	if (!newestConnectionAttemptKey.empty()) {
 		std::string tmp;
 		std::swap(tmp, newestConnectionAttemptKey);
-		if (!GetOperation(tmp)->IsComplete(false))
+		auto newestOperation(GetOperation(tmp));
+		if (newestOperation && !newestOperation->IsComplete(false))
 			std::swap(tmp, newestConnectionAttemptKey);
 	}
 }

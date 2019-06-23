@@ -15,9 +15,12 @@ MySqlQueryOperation::MySqlQueryOperation(MySqlConnection& connPool, std::string&
 }
 
 MySqlQueryOperation::~MySqlQueryOperation() {
-	if (!connection)
-		return;
-	connPool.ReleaseConnection(connection);
+	state->lock.lock();
+	state->alive = false;
+	state->zombie = true;
+	if (connection)
+		connPool.ReleaseConnection(connection);
+	state->lock.unlock();
 }
 
 std::thread MySqlQueryOperation::TryStart() {
@@ -52,20 +55,34 @@ void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassSt
 	else if (!noClose)
 		mysql_close(mysql);
 	mysql_thread_end();
+	
+	if (localClassState->zombie) {
+		localClassState->lock.unlock();
+		return;
+	}
 	localClassState->lock.unlock();
-	--threadCounter;
+	--*threadCounter;
 }
 
 void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText, std::shared_ptr<ClassState> localClassState) {
 	mysql_thread_init();
 
 	const auto localError(mysql_real_query(mysql, localQueryText.c_str(), localQueryText.length()));
-
+	localClassState->lock.lock();
+	if (localClassState->zombie) {
+		mysql_close(mysql);
+		mysql_thread_end();
+		localClassState->lock.unlock();
+		return;
+	}
+	localClassState->lock.unlock();
 	if (localError) {
 		QuestionableExit(mysql, localClassState);
 		return;
 	}
+	
 
+	
 	const auto result(mysql_use_result(mysql));
 	if (!result) {
 		QuestionableExit(mysql, localClassState);
