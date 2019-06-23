@@ -61,7 +61,7 @@ void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassSt
 		return;
 	}
 	localClassState->lock.unlock();
-	--*threadCounter;
+	--threadCounter;
 }
 
 void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText, std::shared_ptr<ClassState> localClassState) {
