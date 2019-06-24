@@ -2,6 +2,7 @@
 
 MySqlConnection::MySqlConnection(Library& library, const unsigned int asyncTimeout, const unsigned int blockingTimeout, const unsigned int threadLimit) :
 	Connection(Type::MySql, library, blockingTimeout),
+	quoteConnection(nullptr),
 	asyncTimeout(asyncTimeout),
 	threadLimit(threadLimit),
 	threadCounter(0)
@@ -80,7 +81,10 @@ MYSQL* MySqlConnection::RequestConnection(std::string& fail, int& failno) {
 }
 
 void MySqlConnection::ReleaseConnection(MYSQL* connection) {
-	availableConnections.emplace(connection);
+	if (!quoteConnection)
+		quoteConnection = connection;
+	else
+		availableConnections.emplace(connection);
 
 
 	if (!newestConnectionAttemptKey.empty()) {
@@ -93,15 +97,10 @@ void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 }
 
 std::string MySqlConnection::Quote(const std::string& str) {
-	int errnum(0);
-	std::string error;
-	const auto mysql(RequestConnection(error, errnum));
-	
-	if (mysql == nullptr)
+	if (!quoteConnection)
 		throw std::runtime_error("Not connected!");
 	
 	auto buffer(std::make_unique<char[]>(str.length() * 2 + 1));	
-	const auto length(mysql_real_escape_string(mysql, buffer.get(), str.c_str(), str.length()));
-	ReleaseConnection(mysql);
+	const auto length(mysql_real_escape_string(quoteConnection, buffer.get(), str.c_str(), str.length()));
 	return std::string(buffer.get(), length);
 }

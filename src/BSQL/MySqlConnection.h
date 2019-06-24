@@ -10,6 +10,7 @@ private:
 	std::string database;
 
 	std::stack<MYSQL*> availableConnections;
+	MYSQL* quoteConnection;
 	std::string newestConnectionAttemptKey;
 
 	std::atomic_uint_fast32_t threadCounter;
