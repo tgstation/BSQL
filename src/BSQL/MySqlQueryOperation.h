@@ -5,7 +5,6 @@ private:
 	std::string queryText;
 	MySqlConnection& connPool;
 	MYSQL* connection;
-	bool noClose;
 	std::shared_ptr<ClassState> state;
 	std::queue<std::string> results;
 	int connectionAttempts;

@@ -2,7 +2,6 @@
 
 MySqlConnection::MySqlConnection(Library& library, const unsigned int asyncTimeout, const unsigned int blockingTimeout, const unsigned int threadLimit) :
 	Connection(Type::MySql, library, blockingTimeout),
-	firstSuccessfulConnection(nullptr),
 	asyncTimeout(asyncTimeout),
 	threadLimit(threadLimit),
 	threadCounter(0)
@@ -20,12 +19,9 @@ MySqlConnection::~MySqlConnection() {
 	while (!availableConnections.empty()) {
 		auto front(availableConnections.top());
 		mysql_close(front);
-		if (front == firstSuccessfulConnection)
-			firstSuccessfulConnection = nullptr;
 		availableConnections.pop();
 	}
-	if (firstSuccessfulConnection)
-		mysql_close(firstSuccessfulConnection);
+
 }
 
 std::string MySqlConnection::Connect(const std::string& address, const unsigned short port, const std::string& username, const std::string& password, const std::string& database) {
@@ -74,21 +70,18 @@ std::string MySqlConnection::CreateQuery(const std::string& queryText) {
 	return AddOp(std::make_unique<MySqlQueryOperation>(*this, std::string(queryText), threadCounter, threadLimit));
 }
 
-MYSQL* MySqlConnection::RequestConnection(std::string& fail, int& failno, bool& doNotClose) {
+MYSQL* MySqlConnection::RequestConnection(std::string& fail, int& failno) {
 	if (availableConnections.empty() && !LoadNewConnection(fail, failno))
 		return nullptr;
 
 	auto front(availableConnections.top());
 	availableConnections.pop();
-	doNotClose = front == firstSuccessfulConnection;
 	return front;
 }
 
 void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 	availableConnections.emplace(connection);
 
-	if (!firstSuccessfulConnection)
-		firstSuccessfulConnection = connection;
 
 	if (!newestConnectionAttemptKey.empty()) {
 		std::string tmp;
@@ -100,9 +93,15 @@ void MySqlConnection::ReleaseConnection(MYSQL* connection) {
 }
 
 std::string MySqlConnection::Quote(const std::string& str) {
-	if (!firstSuccessfulConnection)
+	int errnum(0);
+	std::string error;
+	const auto mysql(RequestConnection(error, errnum));
+	
+	if (mysql == nullptr)
 		throw std::runtime_error("Not connected!");
-	auto buffer(std::make_unique<char[]>(str.length() * 2 + 1));
-	const auto length(mysql_real_escape_string(firstSuccessfulConnection, buffer.get(), str.c_str(), str.length()));
+	
+	auto buffer(std::make_unique<char[]>(str.length() * 2 + 1));	
+	const auto length(mysql_real_escape_string(mysql, buffer.get(), str.c_str(), str.length()));
+	ReleaseConnection(mysql);
 	return std::string(buffer.get(), length);
 }

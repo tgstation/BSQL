@@ -18,14 +18,14 @@ MySqlQueryOperation::~MySqlQueryOperation() {
 	state->lock.lock();
 	state->alive = false;
 	state->zombie = true;
+	state->lock.unlock();
 	if (connection)
 		connPool.ReleaseConnection(connection);
-	state->lock.unlock();
 }
 
 std::thread MySqlQueryOperation::TryStart() {
 	if (!connection) {
-		connection = connPool.RequestConnection(error, errnum, noClose);
+		connection = connPool.RequestConnection(error, errnum);
 		if (!connection) {
 			if (!error.empty())
 				complete = ++connectionAttempts == 3;
@@ -52,7 +52,7 @@ void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassSt
 			errnum = tmpErr;
 		}
 	}
-	else if (!noClose)
+	else
 		mysql_close(mysql);
 	mysql_thread_end();
 	
@@ -70,7 +70,6 @@ void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText,
 	const auto localError(mysql_real_query(mysql, localQueryText.c_str(), localQueryText.length()));
 	localClassState->lock.lock();
 	if (localClassState->zombie) {
-		mysql_close(mysql);
 		mysql_thread_end();
 		localClassState->lock.unlock();
 		return;
@@ -131,7 +130,7 @@ void MySqlQueryOperation::StartQuery(MYSQL* mysql, std::string&& localQueryText,
 				errnum = -1;
 				error = "Out of memory!";
 			}
-			else if (!noClose)
+			else
 				mysql_close(mysql);
 			mysql_thread_end();
 			localClassState->lock.unlock();

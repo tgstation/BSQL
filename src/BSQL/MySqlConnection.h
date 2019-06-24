@@ -10,7 +10,6 @@ private:
 	std::string database;
 
 	std::stack<MYSQL*> availableConnections;
-	MYSQL* firstSuccessfulConnection;
 	std::string newestConnectionAttemptKey;
 
 	std::atomic_uint_fast32_t threadCounter;
@@ -27,6 +26,6 @@ public:
 	std::string CreateQuery(const std::string& queryText) override;
 	std::string Quote(const std::string& str) override;
 
-	MYSQL* RequestConnection(std::string& fail, int& failno, bool& doNotClose);
+	MYSQL* RequestConnection(std::string& fail, int& failno);
 	void ReleaseConnection(MYSQL* connection);
 };
