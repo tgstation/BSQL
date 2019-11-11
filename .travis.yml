@@ -28,7 +28,7 @@ services:
   - mysql
 install:
   - eval "${MATRIX_EVAL}"
-  - build/install_deps.sh
+  - ./LinuxInstall.sh
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
