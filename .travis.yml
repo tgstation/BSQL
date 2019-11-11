@@ -9,7 +9,7 @@ env:
     - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 cache:
   directories:
-    - $HOME/BYOND
+    - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
     - $HOME/MariaDB
 addons:
   apt:
@@ -28,8 +28,7 @@ services:
   - mysql
 install:
   - eval "${MATRIX_EVAL}"
-  - chmod +x LinuxInstall.sh
-  - ./LinuxInstall.sh
+  - build/install_deps.sh
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
   - cp artifacts/src/BSQL/libBSQL.so tests/
