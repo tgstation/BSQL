@@ -9,7 +9,7 @@ env:
     - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 cache:
   directories:
-    - $HOME/BYOND-${BYOND_MAJOR}.${BYOND_MINOR}
+    - $HOME/BYOND
     - $HOME/MariaDB
 addons:
   apt:
