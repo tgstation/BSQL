@@ -28,6 +28,7 @@ services:
   - mysql
 install:
   - eval "${MATRIX_EVAL}"
+  - chmod +x LinuxInstall.sh
   - ./LinuxInstall.sh
 script:
   - mkdir artifacts && cd artifacts && cmake .. && make && cd ..
