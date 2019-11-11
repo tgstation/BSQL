@@ -6,8 +6,8 @@ then
   echo "Using cached BYOND directory."
 else
   echo "Setting up BYOND."
-  mkdir -p "$HOME/BYOND}"
-  cd "$HOME/BYOND}"
+  mkdir -p "$HOME/BYOND"
+  cd "$HOME/BYOND"
   curl "http://www.byond.com/download/build/512/512.1488_byond_linux.zip" -o byond.zip
   unzip byond.zip
   cd byond
