@@ -12,7 +12,8 @@ else
   unzip byond.zip
   cd byond
   make here
-  cd ~/
+  source $HOME/BYOND/byond/bin/byondsetup
+  cd $HOME/
 fi
 
 if [ -f "$HOME/MariaDB/libmariadb.so.2" ] && [ -f "$HOME/MariaDB/libmariadb.so" ];
