@@ -49,7 +49,7 @@ void MySqlQueryOperation::QuestionableExit(MYSQL* mysql, std::shared_ptr<ClassSt
 			errnum = tmpErr;
 		}
 	}
-	else if (!noClose)
+	if (!noClose)
 		mysql_close(mysql);
 	mysql_thread_end();
 	localClassState->lock.unlock();
