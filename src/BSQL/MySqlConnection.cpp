@@ -18,10 +18,6 @@ MySqlConnection::~MySqlConnection() {
 	operations.clear();
 	//and release them
 	while (!availableConnections.empty()) {
-		auto front(availableConnections.top());
-		mysql_close(front);
-		if (front == firstSuccessfulConnection)
-			firstSuccessfulConnection = nullptr;
 		availableConnections.pop();
 	}
 	if (firstSuccessfulConnection)
