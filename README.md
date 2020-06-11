@@ -1,3 +1,14 @@
+# Deprecation warning
+
+## This repository is deprecated, currently /tg/station is using a rust based SQL client library, embedded in rust-g
+This client library has a nasty habit of segfaulting if you do a reconnection option while there are queries out for processing.
+
+You can find rust-g here - https://github.com/tgstation/rust-g - but it also comes packaged with the game.
+
+
+
+
+
 [![Build Status](https://travis-ci.com/tgstation/BSQL.svg?branch=master)](https://travis-ci.com/tgstation/BSQL)
 
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com) [![forinfinityandbyond](https://user-images.githubusercontent.com/5211576/29499758-4efff304-85e6-11e7-8267-62919c3688a9.gif)](https://www.reddit.com/r/SS13/comments/5oplxp/what_is_the_main_problem_with_byond_as_an_engine/dclbu1a)
